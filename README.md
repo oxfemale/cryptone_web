@@ -1,10 +1,11 @@
-# cryptone_web
-Cryptoprotocol Beta 1.0
-Add ping command with data from client and recv data from server - done
-Add subclients registration for username - done
-First user registration - done
-RSA key exchange on fly - done
-AES-256 strong encryption channel
-Inflate/Deflate - compression of transmitted data - done
-Shorthand masking of transmitted data - done
-Encapsulation of data in any data transfer protocol - done
+# cryptone_web <br>
+Cryptoprotocol Beta 1.0 <br>
+Add ping command with data from client and recv data from server - done <br>
+Add subclients registration for username - done <br>
+First user registration - done <br>
+RSA key exchange on fly - done <br>
+AES-256 strong encryption channel <br>
+Inflate/Deflate - compression of trans mitted data - done <br>
+Shorthand masking of transmitted data - done <br>
+Encapsulation of data in any data transfer protocol - done <br>
+ <br><hr
