@@ -50,7 +50,6 @@ int AddNewClientToUser(char* Servername);
 <br>
 AskPasswords.h<br>
 ```cpp
-
 /*
 Function:
 Ask master password for add new subclients for Username
