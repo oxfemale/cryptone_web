@@ -9,7 +9,8 @@ AES-256 strong encryption channel <br>
 Inflate/Deflate - compression of trans mitted data - done <br>
 Shorthand masking of transmitted data - done <br>
 Encapsulation of data in any data transfer protocol - done <br>
+<hr>
 <a href="https://secureline.online/">Project server: secureline.online</a><br>
- <hr>
+<hr>
  
  
