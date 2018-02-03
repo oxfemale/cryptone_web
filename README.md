@@ -13,7 +13,7 @@ Encapsulation of data in any data transfer protocol - done <br>
 <a href="https://secureline.online/">Project server: secureline.online</a><br>
 <hr>
  
-AddNewClient function:<br> 
+AddNewClient.h function:<br> 
 ```cpp
 /*
 function:
@@ -33,8 +33,7 @@ NULL - FAIL
 1 - OK
 */
 int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned char* AESVector, unsigned char*KeyPub, char* Servername, unsigned char* strPwd);
-```
-```cpp
+
 /*
 Function:
 Adding a new client to an existing user.
@@ -47,4 +46,28 @@ return:
 1 if all Ok or 0 if Error
 */
 int AddNewClientToUser(char* Servername);
+```
+<br>
+AskPasswords.h<br>
+```cpp
+
+/*
+Function:
+Ask master password for add new subclients for Username
+The maximum size of the master password is 32 characters.
+return:
+NULL - FAILED
+char* - Password String
+*/
+char* AskMasterPassword();
+
+/*
+Function:
+Asks the password for the crypto container, it stores the settings and important variables
+The maximum size of the crypto container password is 32 characters.
+return:
+NULL - FAILED
+char* - Password String
+*/
+char* AskContainerPassword();
 ```
