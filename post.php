@@ -1,4 +1,5 @@
 <?php
+$GLOBAL_iv128 = '1111333355557777';
 function add_master_table($table)
 {
     $ret = "";
@@ -227,13 +228,13 @@ function aes_decryptExt( $key, $iv, $data )
 
 function aes_encrypt( $key256, $data )
 {
- $iv128 = '1111333355557777';
+ $iv128 = $GLOBALS['GLOBAL_iv128'];
  return base64_encode(openssl_encrypt($data,'AES-256-CTR',$key256,OPENSSL_RAW_DATA,$iv128));
 }
 
 function aes_decrypt( $key256, $data )
 {
- $iv128 = '1111333355557777';
+ $iv128 = $GLOBALS['GLOBAL_iv128'];
  $de64data = base64_decode($data);
  $decodedData = openssl_decrypt($de64data,'AES-256-CTR',$key256,OPENSSL_RAW_DATA,$iv128);
  return $decodedData;
@@ -349,7 +350,26 @@ function JobFromClient($data)
 	$job = $pieces[2];
         date_default_timezone_set("Europe/Moscow");
 	$decrypted_data = aes_decryptExt( $ContainerPassword, $client_easvectror,  $fileData );
-	if(!strstr($decrypted_data,"registered")) return "ERROR: Container password is incorrect";
+	if(!strstr($decrypted_data,"registered")) return "ERROR job: Container password is incorrect[".$ContainerPassword."]";
+	if(strstr($job,"ulist"))
+	{
+		$sql_users = "SELECT clientid, osversion, datetime, alias FROM ".$username." WHERE status=1";
+		$result = mysql_query($sql_users);
+		if (!$result) return "Error userlist: " . mysql_error();
+		$userlist = ":ulist\r\n";
+		while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+		{
+        		$u_clientid = $row["clientid"];
+			if( strstr($u_clientid,$Userid) ) continue;
+			$u_alias = $row["alias"];
+			$u_datetime = $row["datetime"];
+			$u_osversion = $row["osversion"];
+			$userlist = $userlist."ClientID: ".$u_clientid."\r\nAlias: ".$u_alias."\r\nLast login time: ".$u_datetime."\r\nOS Version: ".$u_osversion."\r\n-----\r\n";
+    		}
+		//if ($result) mysql_free_result($result);
+
+		$answer = $userlist;
+	}
 	if(strstr($job,"keys"))
 	{
 		$UnpackedData = UnZipData($jobData);
@@ -393,6 +413,8 @@ function JobFromClient($data)
 
 	$crypted_data = aes_encryptExt( $client_easkey, $client_easvectror, $answer );
 	$DataForClient = base64_encode(gzcompress($crypted_data, 9));
+
+//file_put_contents("base64.txt", $DataForClient);
 
 	return $DataForClient;
 }
@@ -438,8 +460,8 @@ function RegisterStageTmp2( $data )
         	$fileData = $row["masterpassword"];
     	}else return "ERROR: cliendid not found.";
 	if ($result) mysql_free_result($result);
-
-	$decrypted_data = aes_decryptExt( $MasterPassword, "1111333355557777",  $fileData );
+//	$iv128 = $GLOBALS['GLOBAL_iv128'];
+	$decrypted_data = aes_decryptExt( $MasterPassword, $GLOBALS['GLOBAL_iv128'],  $fileData );
 	$sql_users = "delete from templist where clientid='".$Userid."'";
 	$result = mysql_query($sql_users);
 	if (!$result) return "Error delete userid from tmplist: " . mysql_error();
@@ -458,7 +480,9 @@ function RegisterStageTmp2( $data )
 	openssl_pkey_export($openssl_res, $privKey);
 	$pubKey = openssl_pkey_get_details($openssl_res);
 	$pubKey = $pubKey['key'];
-	$crypted_data = aes_encryptExt( $ContainerPassword, $AESVectorNew, "registered" );
+	$crypted_data2 = aes_encryptExt( $ContainerPassword, $AESVectorNew, "registered" );
+//file_put_contents("ContainerPassword", $ContainerPassword);
+//file_put_contents("ContainerPassword", $ContainerPassword);
 
 	$answer = $pubKey.":registered";
 	$crypted_data = aes_encryptExt( $AESKeyNew, $AESVectorNew, $answer );
@@ -468,7 +492,7 @@ function RegisterStageTmp2( $data )
 
 	date_default_timezone_set("Europe/Moscow");
 	$mysqltime = date ("Y-m-d H:i:s");
-	$sql_users1 = "UPDATE ".$username." SET aeskey='".mysql_real_escape_string($AESKeyNew)."', aesvector='".mysql_real_escape_string($AESVectorNew)."', serverpublic='', serverprivate='".mysql_real_escape_string($privKey)."', clientpublic='".mysql_real_escape_string($KeyPub)."', container='".mysql_real_escape_string($crypted_data)."', datetime='".$mysqltime."', status=1 where clientid='".mysql_real_escape_string($Userid)."'";
+	$sql_users1 = "UPDATE ".$username." SET aeskey='".mysql_real_escape_string($AESKeyNew)."', aesvector='".mysql_real_escape_string($AESVectorNew)."', serverpublic='', serverprivate='".mysql_real_escape_string($privKey)."', clientpublic='".mysql_real_escape_string($KeyPub)."', container='".mysql_real_escape_string($crypted_data2)."', datetime='".$mysqltime."', status=1 where clientid='".mysql_real_escape_string($Userid)."'";
 	$result = mysql_query($sql_users1);
 	if (!$result) die('Error1: ' . mysql_error());
 
@@ -517,7 +541,7 @@ function RegisterStage2( $data )
 	$KeyPub = $pieces[4];
 
 	$crypted_data = aes_encryptExt( $ContainerPassword, $AESVectorNew, "registered" );
-	$CryptedMasterData = aes_encryptExt( $MasterPassword, "1111333355557777", "master" );
+	$CryptedMasterData = aes_encryptExt( $MasterPassword, $GLOBALS['GLOBAL_iv128'], "master" );
 
 	$openssl_res = openssl_pkey_new($config);
 	openssl_pkey_export($openssl_res, $privKey);
