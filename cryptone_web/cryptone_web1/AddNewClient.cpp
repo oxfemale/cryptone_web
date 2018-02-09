@@ -108,7 +108,9 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
 
     //Send Packet to Server
     ServerAnswer = SendPacketData(Servername, (char*)ClientPacket);
+#ifdef _DEBUG
     printf("ServerAnswer:\r\n%s\r\n", ServerAnswer);
+#endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
 
     if (ServerAnswer == NULL)
@@ -158,8 +160,9 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         AllData[iCounter] = 0;
 
         unsigned char* ServerPublicKey = AllData;
-
-        //printf("Server Public key: %s\r\n", ServerPublicKey );
+#ifdef _DEBUG
+        printf("Server Public key: %s\r\n", ServerPublicKey );
+#endif
 
         std::string aesk = "";
         aesk.append(BeginServerPublicKey, strlen(BeginServerPublicKey));

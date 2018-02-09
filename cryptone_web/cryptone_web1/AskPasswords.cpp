@@ -37,8 +37,7 @@ char* AskMasterPassword()
         if (AllData[iCount] == 13)
         {
             AllData[iCount] = '-';
-            printf("\r\n!!! REMEBER OR SAVE YOUR PASSWORD !!!\r\n[%s]\r\n", AllData);
-            printf("2) Master password for Add/Remove SubClients and ReLogin.\r\n");
+            printf("\tMaster password for Add/Remove SubClients and ReLogin.\r\n");
             return AllData;
         }
         iCount++;

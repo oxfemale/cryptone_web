@@ -168,11 +168,11 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
     }
 
     PackedBuffer1 = RegPack1(VectorRandom, CertKeyBuffer, iFlag);
-    printf("ClientPubKey:\r\n%s\r\n", CertKeyBuffer);
+    //printf("ClientPubKey:\r\n%s\r\n", CertKeyBuffer);
 
     ServerRegData = SendPacketData(Servername, (char*)PackedBuffer1);
 
-    printf("ServerRegData:\r\n%s\r\n", ServerRegData);
+    //printf("ServerRegData:\r\n%s\r\n", ServerRegData);
 
     VirtualFree(PackedBuffer1, 0, MEM_RELEASE);
     VirtualFree(CertKeyBuffer, 0, MEM_RELEASE);
@@ -492,7 +492,9 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
 
     //Send Packet to Server
     ServerAnswer = SendPacketData(Servername, (char*)ClientPacket);
+#ifdef _DEBUG
 	printf("ServerAnswer:\r\n%s\r\n", ServerAnswer);
+#endif
 
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
 
@@ -543,8 +545,9 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
         AllData[iCounter] = 0;
 
         unsigned char* ServerPublicKey = AllData;
-
-        //printf("Server Public key: %s\r\n", ServerPublicKey );
+#ifdef _DEBUG
+        printf("Server Public key: %s\r\n", ServerPublicKey );
+#endif
 
         std::string aesk = "";
         aesk.append(BeginServerPublicKey, strlen(BeginServerPublicKey));
@@ -662,7 +665,7 @@ int NewUserRegistration(char* Servername)
             if (strstr((char*)AESvsUSER, "okey")) break;
             if (strstr((char*)AESvsUSER, "exists"))
             {
-                printf("User already registered:\r\nSelect another NickName - 1\r\nAdd new SubClient for this NickName - 2\r\nselect: ");
+                printf("User already registered:\r\n\t1 - Select another NickName.\r\n\t2 - Add new SubClient for this username.\r\nselect: ");
                 iSelect[0] = _getch();
                 if (iSelect[0] == '1')
                 {
@@ -763,5 +766,6 @@ int NewUserRegistration(char* Servername)
     VirtualFree(strUsername, 0, MEM_RELEASE);
     VirtualFree(AESvsUSER, 0, MEM_RELEASE);
 
+    
     return 1;
 }

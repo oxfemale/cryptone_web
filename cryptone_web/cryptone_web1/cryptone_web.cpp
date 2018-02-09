@@ -20,6 +20,52 @@ telegram: https://t.me/BelousovaAlisa
 #include "KeysExchange.h"
 #pragma comment (lib, "Wininet.lib")
 
+int SetMenu()
+{
+    char iSelect[2] = {0};
+    for (;;)
+    {
+                printf("Menu for user[%s]:\r\n1 - Get subclients list.\r\n2 - Set client alias.\r\n3 - Upload File.\r\nq - Exit from program.\r\nselect: ", gUsername);
+                iSelect[0] = _getch();
+                if (iSelect[0] == '1')
+                {
+                    printf("%c\r\n", iSelect[0]);
+                    GetSubclientsList();
+                    continue;
+                }
+                if (iSelect[0] == '2')
+                {
+                    printf("%c\r\n", iSelect[0]);
+                    SetSubclientsAlias();
+                    continue;
+                }
+                
+                if ( iSelect[0] == 3 )
+                {
+                    printf("\r\nCancel and exit.\r\n");
+                    return 0;
+                }
+                if (iSelect[0] == 26)
+                {
+                    printf("\r\nCancel and exit.\r\n");
+                    return 0;
+                }
+                if (iSelect[0] == 13)
+                {
+                    printf("\r\nCancel and exit.\r\n");
+                    return 0;
+                }
+                if (iSelect[0] == 'q')
+                {
+                    printf("%c\r\n", iSelect[0]);
+                    printf("\r\nExit.\r\n");
+                    return 0;
+                }
+
+                printf("\r\n");
+    }
+return 0;
+}
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -112,22 +158,10 @@ int _tmain(int argc, _TCHAR* argv[])
 					return 0;
 				}
 				printf("Server ping OK.\r\n");
-
-                if (SetKeysMem(strPwd) == 0)
-                {
-                    printf("Read Global keys error.\r\n");
-                    return 0;
-                }
+                SetKeysMem(strPwd);
                 ClientServerKeysExchange(strPwd);
                 SetKeysMem(strPwd);
-                if (ClientPingServer(Servername, strPwd) == 0)
-                {
-                    printf("Server ping with new keys ERROR.\r\n");
-                    return 0;
-                }
-                printf("Server ping with new keys OK.\r\n");
-                //printf("gAESkey: %s\r\ngAESVector: %s\r\ngUseridhash: %s\r\ngServerPassword: %s\r\n", gAESkey, gAESVector, gUseridhash, gServerPassword);
-                GetSubclientsList();
+                SetMenu();
 				return 1;
 			}
 		}else{
@@ -144,7 +178,15 @@ int _tmain(int argc, _TCHAR* argv[])
 			return 0;
 		}else
 		{
-			printf("Registration Ok\r\n");
+			printf("Registration Ok\r\nCrypt and close program container.\r\n");
+            strPwd = (unsigned char*)AskContainerPassword();
+            if (strPwd == NULL) return 0;
+            ClientPingServer(Servername, strPwd);
+            SetKeysMem(strPwd);
+            ClientServerKeysExchange(strPwd);
+            SetKeysMem(strPwd);
+            SetMenu();
+
 			return 1;
 		}
 		VirtualFree( strPwd, 0, MEM_RELEASE );

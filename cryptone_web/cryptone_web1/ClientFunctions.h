@@ -30,3 +30,16 @@ int 1 if all Ok
 (Also, the server returns a free space on the hard disk of the server.)
 */
 int GetSubclientsList();
+
+/*
+Function:
+The function to set a alias for subclient.
+
+vars:
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+(Also, the server returns a free space on the hard disk of the server.)
+*/
+int SetSubclientsAlias();

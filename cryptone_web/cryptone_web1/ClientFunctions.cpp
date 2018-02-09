@@ -139,7 +139,7 @@ int ClientPingServer(char* Servername, unsigned char* strPwd)
         return NULL;
     }
 
-    printf("ServerContainerPassword: %s\r\n", ServerContainerPassword);
+    //printf("ServerContainerPassword: %s\r\n", ServerContainerPassword);
     //clear_data:SubCommand
     _snprintf((char*)AllData, (iLen - 4), "%s:%s:ping", (char*)ServerContainerPassword, PackedData);
     VirtualFree(PackedData, 0, MEM_RELEASE);
@@ -162,7 +162,9 @@ int ClientPingServer(char* Servername, unsigned char* strPwd)
     //Send Packet to Server
     ServerAnswer = SendPacketData(Servername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
+#ifdef _DEBUG
     printf("answer:[%s]\r\n", ServerAnswer);
+#endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
@@ -251,7 +253,9 @@ int GetSubclientsList( )
     //Send Packet to Server
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
+#ifdef _DEBUG
     printf("answer:[%s]\r\n", ServerAnswer);
+#endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
@@ -270,13 +274,132 @@ int GetSubclientsList( )
     }
     if (strstr((char*)DecryptedData, ":ulist"))
     {
-        DecryptedData[strlen((char*)DecryptedData) - 4] = 0;
-        printf("Subclients list:\r\n(%s)\r\n", (char*)DecryptedData);
+        //DecryptedData[strlen((char*)DecryptedData) - 4] = 0;
+        printf("Subclients %s\r\n", (char*)DecryptedData);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
         gUpdateKeys = 0;
         return 1;
     }
     gUpdateKeys = 0;
+#ifdef _DEBUG
     printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
+#endif
+    return 0;
+}
+
+/*
+Function:
+The function to set a alias for subclient.
+
+vars:
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+(Also, the server returns a free space on the hard disk of the server.)
+*/
+int SetSubclientsAlias()
+{
+    unsigned char* AllData = NULL;
+    int iLen = 0;
+    unsigned char* ClientPacket = NULL;
+    char* ServerAnswer = NULL;
+    unsigned char* DecryptedData = NULL;
+    char* ClientAlias = NULL;
+
+    while (gUpdateKeys == 1)
+    {
+        Sleep(300);
+    }
+    gUpdateKeys = 1;
+
+    
+    ClientAlias = (char*)VirtualAlloc(NULL, 32, MEM_COMMIT, PAGE_READWRITE);
+    if (ClientAlias == NULL) return 0;
+    memset(ClientAlias, 0, 32);
+    int iCount = 0;
+    printf("Please input subclient alias 32 symbols max: ");
+    do
+    {
+        ClientAlias[iCount] = _getch();
+        printf("%c", ClientAlias[iCount]);
+        if (ClientAlias[iCount] == 3)
+        {
+            printf("\r\nCancel and exit.\r\n");
+            VirtualFree(ClientAlias, 0, MEM_RELEASE);
+            return NULL;
+        }
+        if (ClientAlias[iCount] == 26)
+        {
+            printf("\r\nCancel and exit.\r\n");
+            VirtualFree(ClientAlias, 0, MEM_RELEASE);
+            return NULL;
+        }
+        if (ClientAlias[iCount] == 13)
+        {
+            ClientAlias[iCount] = 0;
+            printf("\r\n");
+            break;
+        }
+        iCount++;
+    } while (iCount < 32);
+
+
+    iLen = strlen((char*)gServerPassword) + strlen(ClientAlias) + 64;
+    AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
+    if (AllData == NULL)
+    {
+        printf("VirtualAlloc error.\r\n");
+        gUpdateKeys = 0;
+        return NULL;
+    }
+
+    //clear_data:SubCommand
+    _snprintf((char*)AllData, (iLen - 4), "%s:%s:alias", (char*)gServerPassword, ClientAlias);
+    VirtualFree(ClientAlias, 0, MEM_RELEASE);
+    
+    ClientPacket = PackClientPacket(AllData, gUseridhash, gAESkey, gAESVector, "job");
+    VirtualFree(AllData, 0, MEM_RELEASE);
+    if (ClientPacket == NULL)
+    {
+        printf("PackClientPacket error.\r\n");
+        gUpdateKeys = 0;
+        return NULL;
+    }
+
+    //Send Packet to Server
+    ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
+    //printf("ClientPacket:[%s]\r\n", ClientPacket);
+#ifdef _DEBUG
+    printf("answer:[%s]\r\n", ServerAnswer);
+#endif
+    VirtualFree(ClientPacket, 0, MEM_RELEASE);
+    if (ServerAnswer == NULL)
+    {
+        printf("Server return error.\r\n");
+        gUpdateKeys = 0;
+        return 0;
+    }
+
+    DecryptedData = DecryptServerPacket(ServerAnswer, gAESkey, gAESVector);
+    VirtualFree(ServerAnswer, 0, MEM_RELEASE);
+    if (DecryptedData == NULL)
+    {
+        printf("Server answer aes256_decrypt error.\r\n");
+        gUpdateKeys = 0;
+        return 0;
+    }
+    if (strstr((char*)DecryptedData, ":alias"))
+    {
+        DecryptedData[strlen((char*)DecryptedData) - 6] = 0;
+        printf("New alias is set to: %s\r\n", (char*)DecryptedData);
+        VirtualFree(DecryptedData, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
+        return 1;
+    }
+    gUpdateKeys = 0;
+#ifdef _DEBUG
+    printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
+#endif
     return 0;
 }

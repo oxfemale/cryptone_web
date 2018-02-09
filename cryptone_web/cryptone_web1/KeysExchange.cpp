@@ -190,6 +190,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
         printf("Error strPwd is null.\r\n");
         return 0;
     }
+    
 
     NewKeysAllData = GegNewKeys( &newAESKey, &newAESVector, &newClientPublicKey, &newClientPrivateKey, &newClientCertKey);
     if (NewKeysAllData == NULL)
@@ -241,8 +242,10 @@ int ClientServerKeysExchange(unsigned char* strPwd)
 
     //Send Packet to Server
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
-    printf("ClientPacket:[%s]\r\n", ClientPacket);
+    //printf("ClientPacket:[%s]\r\n", ClientPacket);
+#ifdef _DEBUG
     printf("answer:[%s]\r\n", ServerAnswer);
+#endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
@@ -271,7 +274,9 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     {
         iLen = strlen(":KeysExOK");
         DecryptedData[strlen((char*)DecryptedData) - iLen] = 0;
+#ifdef _DEBUG
         printf("Server Public key: %s\r\n", (char*)DecryptedData);
+#endif
         while (UpdateCurrentKeys(strPwd, newAESKey, newAESVector, newClientPrivateKey, newClientPublicKey, newClientCertKey, DecryptedData) == 0)
         {
             Sleep(500);
@@ -292,6 +297,6 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(newClientCertKey, 0, MEM_RELEASE);
     VirtualFree(DecryptedData, 0, MEM_RELEASE);
    printf("Keys updated - OK.\r\n");
-
+   
     return 0;
 }
