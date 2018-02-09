@@ -4,7 +4,7 @@ Current status: <br>
 Beta version release: <a href="https://github.com/oxfemale/cryptone_web/releases/">https://github.com/oxfemale/cryptone_web/releases/</a> - done <br>
 Add read server name from file - done <br>
 Add read default AES vector from file - done <br>
-Add keys exchnage on fly - done <br>
+Add keys exchange on fly - done <br>
 Add ping command to server - done  <br>
 Client/Server data exchange - done <br>
 Add subclients registration for username - done <br>
