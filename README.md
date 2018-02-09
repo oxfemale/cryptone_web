@@ -4,7 +4,7 @@ Current status: <br>
 Beta version release: <a href="https://github.com/oxfemale/cryptone_web/releases/">https://github.com/oxfemale/cryptone_web/releases/</a> - done <br>
 Add get subclients list for current user - done <br>
 Add select functional menu for console - done <br>
-Add change alias function - done <br>
+Add change subclient alias function - done <br>
 Add read server name from file - done <br>
 Add read default AES vector from file - done <br>
 Add keys exchange on fly - done <br>
