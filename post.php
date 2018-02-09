@@ -1,5 +1,38 @@
 <?php
 $GLOBAL_iv128 = '1111333355557777';
+
+function add_eventslist_table($table)
+{
+    $ret = "";
+    $sql_users = "SELECT table_name FROM information_schema.tables where table_name='".$table."'";
+    $result = mysql_query($sql_users);
+    if (!$result) Return "Error SQL1: " . mysql_error();
+    if ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+    {
+	return 0;
+    }else{
+	$sql_users = "CREATE TABLE ".$table." (id MEDIUMINT NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, fromid VARCHAR(255) NOT NULL, toid VARCHAR(255) NOT NULL, eventstatus INT NOT NULL, PRIMARY KEY (id));";
+	$result = mysql_query($sql_users);
+    	if (!$result) Return "Error SQL2: " . mysql_error();
+    }
+}
+
+function add_fileslist_table($table)
+{
+    $ret = "";
+    $sql_users = "SELECT table_name FROM information_schema.tables where table_name='".$table."'";
+    $result = mysql_query($sql_users);
+    if (!$result) Return "Error SQL1: " . mysql_error();
+    if ($row = mysql_fetch_array($result, MYSQL_ASSOC))
+    {
+	return 0;
+    }else{
+	$sql_users = "CREATE TABLE ".$table." (id MEDIUMINT NOT NULL AUTO_INCREMENT, username VARCHAR(255) NOT NULL, fromid VARCHAR(255) NOT NULL, toid VARCHAR(255) NOT NULL, filename VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL, filesize INT NOT NULL, allcount INT NOT NULL, currentcount INT NOT NULL, flag INT NOT NULL, event INT NOT NULL, PRIMARY KEY (id));";
+	$result = mysql_query($sql_users);
+    	if (!$result) Return "Error SQL2: " . mysql_error();
+    }
+}
+
 function add_master_table($table)
 {
     $ret = "";
@@ -342,7 +375,6 @@ function JobFromClient($data)
         	$client_easvectror = $row["aesvector"];
 		$fileData = $row["container"];
     	}else return "ERROR: cliendid not found.";
-
 	$decrypted_data = aes_decryptExt( $client_easkey, $client_easvectror, $CodedData );
 	$pieces = explode(":", $decrypted_data);
 	$ContainerPassword = $pieces[0];
@@ -351,12 +383,24 @@ function JobFromClient($data)
         date_default_timezone_set("Europe/Moscow");
 	$decrypted_data = aes_decryptExt( $ContainerPassword, $client_easvectror,  $fileData );
 	if(!strstr($decrypted_data,"registered")) return "ERROR job: Container password is incorrect[".$ContainerPassword."]";
+	if(strstr($job,"upload"))
+	{
+	}
+	if(strstr($job,"alias"))
+	{
+		$mysqltime = date ("Y-m-d H:i:s");
+		$sql_users1 = "UPDATE ".$username." SET datetime='".$mysqltime."', alias='".mysql_real_escape_string($jobData)."' where clientid='".mysql_real_escape_string($Userid)."'";
+		$result = mysql_query($sql_users1);
+		if (!$result) return "Error update client data: " . mysql_error();
+		$answer = $jobData.":alias";
+	}
 	if(strstr($job,"ulist"))
 	{
 		$sql_users = "SELECT clientid, osversion, datetime, alias FROM ".$username." WHERE status=1";
 		$result = mysql_query($sql_users);
 		if (!$result) return "Error userlist: " . mysql_error();
-		$userlist = ":ulist\r\n";
+		$userlist = "";
+		$userscount = 0;
 		while($row = mysql_fetch_array($result, MYSQL_ASSOC))
 		{
         		$u_clientid = $row["clientid"];
@@ -365,10 +409,11 @@ function JobFromClient($data)
 			$u_datetime = $row["datetime"];
 			$u_osversion = $row["osversion"];
 			$userlist = $userlist."ClientID: ".$u_clientid."\r\nAlias: ".$u_alias."\r\nLast login time: ".$u_datetime."\r\nOS Version: ".$u_osversion."\r\n-----\r\n";
+			$userscount++;
     		}
 		//if ($result) mysql_free_result($result);
 
-		$answer = $userlist;
+		$answer = ":ulist[".$userscount."]\r\n".$userlist;
 	}
 	if(strstr($job,"keys"))
 	{
@@ -690,6 +735,9 @@ function RegisterStageTmp1( $data )
 add_main_table("userlist");
 add_main_table("templist");
 add_master_table("masterlist");
+add_fileslist_table("fileslist");
+add_eventslist_table("eventslist");
+
 if(!empty($_POST["var"]))
 {
     $var = $_POST["var"];
