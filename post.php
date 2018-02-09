@@ -318,6 +318,11 @@ function FindUsernameByRegUserid ( $Userid )
 function JobFromClient($data)
 {
 	$DataForClient = "ERROR: error";
+	$config = array(
+	"digest_alg" => "sha512",
+	"private_key_bits" => 2048,
+	"private_key_type" => OPENSSL_KEYTYPE_RSA,
+	);
 	$answer = "";
 	$pieces = explode(":", $data);
 	$Userid = $pieces[1];
@@ -336,41 +341,43 @@ function JobFromClient($data)
         	$client_easvectror = $row["aesvector"];
 		$fileData = $row["container"];
     	}else return "ERROR: cliendid not found.";
-	//if ($result) mysql_free_result($result);
-
-/*
-	$client_container_file = $client_dir."container.dat";
-	if (!file_exists( $client_container_file )) return "ERROR: container file not found";
-
-	$client_easkey_file = $client_dir."aes.key";
-	if (!file_exists( $client_easkey_file )) return "ERROR: eas.key file not found";
-	$client_easkey = file_get_contents($client_easkey_file);
-
-	$client_easvectror_file = $client_dir."vector.key";
-	if (!file_exists( $client_easvectror_file )) return "ERROR: vector.key file not found";
-	$client_easvectror = file_get_contents($client_easvectror_file);
-*/
 
 	$decrypted_data = aes_decryptExt( $client_easkey, $client_easvectror, $CodedData );
 	$pieces = explode(":", $decrypted_data);
 	$ContainerPassword = $pieces[0];
 	$jobData = $pieces[1];
 	$job = $pieces[2];
-
-//	$fileData = file_get_contents($client_container_file);
+        date_default_timezone_set("Europe/Moscow");
 	$decrypted_data = aes_decryptExt( $ContainerPassword, $client_easvectror,  $fileData );
 	if(!strstr($decrypted_data,"registered")) return "ERROR: Container password is incorrect";
+	if(strstr($job,"keys"))
+	{
+		$UnpackedData = UnZipData($jobData);
+		$openssl_res = openssl_pkey_new($config);
+		openssl_pkey_export($openssl_res, $privKey);
+		$pubKey = openssl_pkey_get_details($openssl_res);
+		$ServerPublicKey = $pubKey['key'];
+		$pieces = explode(":", $UnpackedData);
+		$newAESKey = $pieces[0];
+        	$newAESVector = $pieces[1];
+		$newClientPublicKey = $pieces[2];
+		$crypted_data = aes_encryptExt( $ContainerPassword, $newAESVector, "registered" );
+
+		$mysqltime = date ("Y-m-d H:i:s");
+		$sql_users1 = "UPDATE ".$username." SET datetime='".$mysqltime."', aeskey='".mysql_real_escape_string($newAESKey)."', aesvector='".mysql_real_escape_string($newAESVector)."', serverprivate='".mysql_real_escape_string($privKey)."', clientpublic='".mysql_real_escape_string($newClientPublicKey)."', container='".mysql_real_escape_string($crypted_data)."' where clientid='".mysql_real_escape_string($Userid)."'";
+		$result = mysql_query($sql_users1);
+		if (!$result) return "Error update client data: " . mysql_error();
+
+		$answer = $ServerPublicKey.":KeysExOK";
+	}
 	if(strstr($job,"ping"))
 	{
 		$osVersion = UnZipData($jobData);
-//		$clientSysInfoFile = $client_dir."sysinfo.txt";
-		date_default_timezone_set("Europe/Moscow");
 		$mysqltime = date ("Y-m-d H:i:s");
 		$sql_users1 = "UPDATE ".$username." SET datetime='".$mysqltime."', osversion='".mysql_real_escape_string($osVersion)."' where clientid='".mysql_real_escape_string($Userid)."'";
 		$result = mysql_query($sql_users1);
 		if (!$result) return "Error update client data: " . mysql_error();
 
-//		file_put_contents( $clientSysInfoFile, $osVersion);
 		$Bytes = disk_free_space(getcwd());
 		$Type=array("", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta");
 		$Index=0;
@@ -405,15 +412,6 @@ function RegisterStageTmp2( $data )
 	if( strstr($username,"Error")) return $DataForClient;
         $client_dir = getcwd()."/users/".$username."_user/".$Userid."_clientTMPID/";
 	$client_dir_new = getcwd()."/users/".$username."_user/".$Userid."_client/";
-/*
-	$client_easkey_file = $client_dir."aes.key";
-	if (!file_exists( $client_easkey_file )) return "ERROR: eas.key file not found";
-	$client_easkey = file_get_contents($client_easkey_file);
-
-	$client_easvectror_file = $client_dir."vector.key";
-	if (!file_exists( $client_easvectror_file )) return "ERROR: vector.key file not found";
-	$client_easvectror = file_get_contents($client_easvectror_file);
-*/
 	$sql_data = "SELECT aeskey, aesvector FROM ".$username." WHERE clientid='".mysql_real_escape_string($Userid)."' AND status=0";
 	$result = mysql_query($sql_data);
 	if (!$result) return "Error SQL1: " . mysql_error();
