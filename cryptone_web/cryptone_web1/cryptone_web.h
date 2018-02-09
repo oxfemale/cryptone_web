@@ -1,7 +1,19 @@
 #include "stdafx.h"
 int bestType = 0;
-unsigned char * iv128 = (unsigned char *)"1111333355557777"; // 16 byte (128 bit)
+unsigned char * iv128 = NULL;
 unsigned char* strUsername = NULL;
+char* gServername = NULL;
+
+unsigned char * gAESkey = NULL;
+unsigned char * gAESVector = NULL;
+unsigned char * gClientPublic = NULL;
+unsigned char * gClientPrivate = NULL;
+unsigned char * gClientCert = NULL;
+unsigned char * gServerPublic = NULL;
+unsigned char * gUseridhash = NULL;
+unsigned char * gUsername = NULL;
+unsigned char * gServerPassword = NULL;
+int gUpdateKeys = 0;
 
 char* BeginPrivateKey = "-----BEGIN PRIVATE KEY-----";
 char* EndPrivateKey = "-----END PRIVATE KEY-----";

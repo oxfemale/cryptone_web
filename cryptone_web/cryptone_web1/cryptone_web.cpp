@@ -62,12 +62,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
 
-	pFile = fopen("file", "rb");
+	pFile = fopen("file.cfg", "rb");
 	if(pFile != NULL)
 	{
 		fclose(pFile);
 		FILE* pasFile = NULL;
-		pasFile = fopen("pass", "rb");
+		pasFile = fopen("pass.cfg", "rb");
 		if(pasFile == NULL)
 		{
 			strPwd = (unsigned char*)AskContainerPassword( );
@@ -92,7 +92,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			if( TestCfgVars( strPwd ) == 0 )
 			{
 				printf("Error test Container vars.\r\n");
-				remove( "file" );
+				remove( "file.cfg" );
 				printf("Container keys is deleted, please, goto login/register again.\r\n");
 				return 0;
 			}
@@ -100,7 +100,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			if ( isRegUser( strPwd ) == 0 )
 			{
 				printf("Not reggged user.\r\n");
-				remove( "file" );
+				remove( "file.cfg" );
 				printf("Container keys is deleted, please, goto login/register again.\r\n");
 				return 0;
 			}else{
@@ -119,18 +119,20 @@ int _tmain(int argc, _TCHAR* argv[])
                     return 0;
                 }
                 ClientServerKeysExchange(strPwd);
+                SetKeysMem(strPwd);
                 if (ClientPingServer(Servername, strPwd) == 0)
                 {
                     printf("Server ping with new keys ERROR.\r\n");
                     return 0;
                 }
                 printf("Server ping with new keys OK.\r\n");
-
+                //printf("gAESkey: %s\r\ngAESVector: %s\r\ngUseridhash: %s\r\ngServerPassword: %s\r\n", gAESkey, gAESVector, gUseridhash, gServerPassword);
+                GetSubclientsList();
 				return 1;
 			}
 		}else{
-			//remove( "file" );
-			printf("Error: Container password is wrong or container file is bad.\r\n");
+			//remove( "file.cfg" );
+			printf("Error: Container password is wrong or container file is bad.\r\nDelete file.cfg if not remebers container password.\r\n");
 			return 0;
 		}
 	}else
@@ -138,7 +140,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		if ( NewUserRegistration( Servername ) == 0 )
 		{
 			printf("Registration error.\r\n");
-            remove("file");
+            		remove("file.cfg");
 			return 0;
 		}else
 		{

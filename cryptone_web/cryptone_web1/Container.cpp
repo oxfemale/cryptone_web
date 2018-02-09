@@ -81,7 +81,7 @@ unsigned char* ReadAllContainer(unsigned char* key256)
     unsigned char *php_cipher = NULL;
 
 
-    pFile = fopen("file", "rb");
+    pFile = fopen("file.cfg", "rb");
     if (pFile == NULL) return 0;
 
     fseek(pFile, 0, SEEK_END);
@@ -182,7 +182,7 @@ return:
 int IsContainer()
 {
     FILE * pFile = NULL;
-    pFile = fopen("file", "r");
+    pFile = fopen("file.cfg", "r");
     if (pFile != NULL)
     {
         fclose(pFile);
@@ -247,7 +247,7 @@ int MakeKeystoContainer(unsigned char* key256)
     VirtualFree(CertificateKeyStr, 0, MEM_RELEASE);
     VirtualFree(AllData, 0, MEM_RELEASE);
 
-    pFile = fopen("file", "wb");
+    pFile = fopen("file.cfg", "wb");
     if (pFile == NULL)
     {
         VirtualFree(cpp_cipher, 0, MEM_RELEASE);
@@ -298,7 +298,7 @@ int ReadContainer(unsigned char* key256, int iKeyType, unsigned char **KeyBuffer
     FILE* pFile = NULL;
     char* AllData = NULL;
     unsigned char *php_cipher = NULL;
-    pFile = fopen("file", "rb");
+    pFile = fopen("file.cfg", "rb");
     if (pFile == NULL) return 0;
     fseek(pFile, 0, SEEK_END);
     long lSize = ftell(pFile);
@@ -656,7 +656,7 @@ int UpdateContainer(unsigned char* key256, char* cBegin, char* cEnd, unsigned ch
     unsigned char *php_cipher = NULL;
     unsigned char *cpp_cipher = NULL;
     unsigned char *new_php_cipher = NULL;
-    pFile = fopen("file", "rb");
+    pFile = fopen("file.cfg", "rb");
     if (pFile == NULL) return 0;
     fseek(pFile, 0, SEEK_END);
     long lSize = ftell(pFile);
@@ -711,7 +711,7 @@ int UpdateContainer(unsigned char* key256, char* cBegin, char* cEnd, unsigned ch
     cpp_cipher = aes256_encryptC((unsigned char *)AllData, iSeek, key256, iv128, cryptedLen);
     VirtualFree(AllData, 0, MEM_RELEASE);
     if (cpp_cipher == NULL) return 0;
-    pFile = fopen("file", "wb");
+    pFile = fopen("file.cfg", "wb");
     if (pFile == NULL)
     {
         VirtualFree(php_cipher, 0, MEM_RELEASE);

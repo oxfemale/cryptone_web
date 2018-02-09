@@ -180,7 +180,7 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
     {
         printf("Server return error.\r\n");
         VirtualFree(VectorRandom, 0, MEM_RELEASE);
-        remove("file");
+        remove("file.cfg");
         return 0;
     }
 
@@ -193,7 +193,7 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
     {
         printf("Error base64 decode answer.\r\n");
         VirtualFree(VectorRandom, 0, MEM_RELEASE);
-        remove("file");
+        remove("file.cfg");
         return 0;
     }
 
@@ -204,7 +204,7 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
     {
         printf("Error decompress answer.\r\n");
         VirtualFree(VectorRandom, 0, MEM_RELEASE);
-        remove("file");
+        remove("file.cfg");
         return 0;
     }
 
@@ -214,7 +214,7 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
         printf("Error read private key from conyainer.\r\n");
         VirtualFree(debase64, 0, MEM_RELEASE);
         VirtualFree(VectorRandom, 0, MEM_RELEASE);
-        remove("file");
+        remove("file.cfg");
         return 0;
     }
 
@@ -225,7 +225,7 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
         VirtualFree(VectorRandom, 0, MEM_RELEASE);
         VirtualFree(PrivKey, 0, MEM_RELEASE);
         VirtualFree(debase64, 0, MEM_RELEASE);
-        remove("file");
+        remove("file.cfg");
         return 0;
     }
 
@@ -237,11 +237,11 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
         printf("Error private decrypt answer.\r\n");
         VirtualFree(decrypteddata, 0, MEM_RELEASE);
         VirtualFree(VectorRandom, 0, MEM_RELEASE);
-        remove("file");
+        remove("file.cfg");
         return 0;
     }
     VirtualFree(VectorRandom, 0, MEM_RELEASE);
-    remove("file");
+    remove("file.cfg");
 
     return decrypteddata;
 }
@@ -554,7 +554,7 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
         {
             aesk.clear();
             printf("Error update container, container deleted.\r\n");
-            remove("file");
+            remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
             VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
@@ -572,7 +572,7 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
         {
             aesk.clear();
             printf("Error update container, container deleted.\r\n");
-            remove("file");
+            remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
             VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
@@ -589,7 +589,7 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
         {
             aesk.clear();
             printf("Error update container, container deleted.\r\n");
-            remove("file");
+            remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
             VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
@@ -607,7 +607,7 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
         {
             aesk.clear();
             printf("Error update container, container deleted.\r\n");
-            remove("file");
+            remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
             VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
@@ -735,7 +735,7 @@ int NewUserRegistration(char* Servername)
         if (UpdateContainer(strPwd, step1, step2, (unsigned char*)aesk.c_str()) == 0)
         {
             printf("Error safe final step registration, container deleted, please try register again.\r\n");
-            remove("file");
+            remove("file.cfg");
             aesk.clear();
             VirtualFree(KeyPub, 0, MEM_RELEASE);
             VirtualFree(AESKey, 0, MEM_RELEASE);
