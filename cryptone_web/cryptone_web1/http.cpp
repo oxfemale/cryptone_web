@@ -43,11 +43,12 @@ char* readNetData(HINTERNET hRequest, char* AllData, DWORD packetSize, DWORD &dw
             dwByteRead = 0;
             return AllData;
         }
+        
         memcpy_s(tmpData, dwAddLen, AllData, dwAllByteRead);
-        memcpy_s(tmpData, dwAddLen, szData, dwByteRead);
+        memcpy_s(&tmpData[dwAllByteRead], dwAddLen, szData, dwByteRead);
         VirtualFree(AllData, 0, MEM_RELEASE);
         dwAllByteRead = dwAllByteRead + dwByteRead;
-        return AllData;
+        return tmpData;
     }
     return NULL;
 }
