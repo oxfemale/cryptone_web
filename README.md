@@ -2,6 +2,7 @@
 <b>This is a protocol for secure communication (chats, files, data from the client to the client, data from the client to the servers, remote management of any client by password, and the like).</b><br>
 Current status: <br>
 Beta version release: <a href="https://github.com/oxfemale/cryptone_web/releases/">https://github.com/oxfemale/cryptone_web/releases/</a> - done <br>
+Add get subclients list for current user - done <br>
 Add select functional menu for console - done <br>
 Add change alias function - done <br>
 Add read server name from file - done <br>
