@@ -12,6 +12,19 @@ extern char GlobUserName_buf[64];
 extern int bestType;
 extern unsigned char * iv128;
 extern unsigned char* strUsername;
+extern char* gServername;
+//Global keys
+extern unsigned char * gAESkey;
+extern unsigned char * gAESVector;
+extern unsigned char * gClientPublic;
+extern unsigned char * gClientPrivate;
+extern unsigned char * gClientCert;
+extern unsigned char * gServerPublic;
+extern unsigned char * gUseridhash;
+extern unsigned char * gUsername;
+extern unsigned char * gServerPassword;
+
+extern int gUpdateKeys;
 
 extern char* BeginPrivateKey;
 extern char* EndPrivateKey;

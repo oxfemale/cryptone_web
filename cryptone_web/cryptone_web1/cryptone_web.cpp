@@ -16,6 +16,8 @@ telegram: https://t.me/BelousovaAlisa
 #include "UserRegistration.h"
 #include "AddNewClient.h"
 #include "ClientFunctions.h"
+#include "ReadCfgFiles.h"
+#include "KeysExchange.h"
 #pragma comment (lib, "Wininet.lib")
 
 
@@ -25,15 +27,31 @@ int _tmain(int argc, _TCHAR* argv[])
 	hModuleCRYPT = NULL;
 	unsigned char* strPwd = NULL;
 	FILE* pFile = NULL;
-	char* Servername = "www.ckeck.space";
+    char* Servername = NULL;
 
-	hModuleCRYPT = LoadLibraryA(cryptone);
-	if(hModuleCRYPT == NULL) 
-	{
-		printf("Error[%d] load [%s] dll\r\n", GetLastError(), cryptone);
-		return 0;
-	}
-	if( doPingServer(Servername) == 1 )
+   
+
+    hModuleCRYPT = LoadLibraryA(cryptone);
+    if (hModuleCRYPT == NULL)
+    {
+        printf("Error[%d] load [%s] dll\r\n", GetLastError(), cryptone);
+        return 0;
+    }
+
+    if (SetDefaultAESVector() == 0)
+    {
+        printf("Error set default aes vector.\r\n");
+        return 0;
+    }
+
+    if (ServersList() == 0)
+    {
+        printf("Error set servername.\r\n");
+        return 0;
+    }
+    Servername = gServername;
+
+    if( doPingServer(Servername) == 1 )
 	{
 		printf("Server is Alive.\r\n");
 		bestType = SelectBestHttpTraffic(Servername);
@@ -92,12 +110,23 @@ int _tmain(int argc, _TCHAR* argv[])
 				{
 					printf("Server ping ERROR.\r\n");
 					return 0;
-				}else
-				{
-					printf("Server ping OK.\r\n");
-					return 1;
 				}
-				return 0;
+				printf("Server ping OK.\r\n");
+
+                if (SetKeysMem(strPwd) == 0)
+                {
+                    printf("Read Global keys error.\r\n");
+                    return 0;
+                }
+                ClientServerKeysExchange(strPwd);
+                if (ClientPingServer(Servername, strPwd) == 0)
+                {
+                    printf("Server ping with new keys ERROR.\r\n");
+                    return 0;
+                }
+                printf("Server ping with new keys OK.\r\n");
+
+				return 1;
 			}
 		}else{
 			//remove( "file" );
@@ -109,6 +138,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		if ( NewUserRegistration( Servername ) == 0 )
 		{
 			printf("Registration error.\r\n");
+            remove("file");
 			return 0;
 		}else
 		{

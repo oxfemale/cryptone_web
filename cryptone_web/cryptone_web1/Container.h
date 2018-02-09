@@ -3,6 +3,19 @@
 
 /*
 Function:
+Read global crypt keys and user info. (need to server connect)
+
+vars:
+strPwd - Container password
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+*/
+int SetKeysMem(unsigned char* strPwd);
+
+/*
+Function:
 Opens the encryption container and gets its contents in the decrypted form
 
 vars:

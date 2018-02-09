@@ -2,6 +2,63 @@
 #include "globalvars.h"
 #include "Container.h"
 
+/*
+Function:
+Read global crypt keys and user info. (need to server connect)
+
+vars:
+strPwd - Container password
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+*/
+int SetKeysMem(unsigned char* strPwd)
+{
+    if (strPwd == NULL)
+    {
+        printf("Error strPwd is null.\r\n");
+        return 0;
+    }
+
+    if (ReadContainer(strPwd, 5, &gAESkey, 1) == 0)
+    {
+        printf("Error read AESKey from container.\r\n");
+        return 0;
+    }
+
+    if (ReadContainer(strPwd, 8, &gAESVector, 1) == 0)
+    {
+        printf("Error read AESVector from container.\r\n");
+        VirtualFree(gAESkey, 0, MEM_RELEASE);
+        return 0;
+    }
+    if (ReadContainer(strPwd, 7, &gUseridhash, 1) == 0)
+    {
+        printf("Error read Client Userid hash from container.\r\n");
+        VirtualFree(gAESkey, 0, MEM_RELEASE);
+        VirtualFree(gAESVector, 0, MEM_RELEASE);
+        return 0;
+    }
+    if (ReadContainer(strPwd, 6, &gUsername, 1) == 0)
+    {
+        printf("Error read Username from container.\r\n");
+        VirtualFree(gAESkey, 0, MEM_RELEASE);
+        VirtualFree(gAESVector, 0, MEM_RELEASE);
+        VirtualFree(gUseridhash, 0, MEM_RELEASE);
+        return 0;
+    }
+    if (ReadContainer(strPwd, 9, &gServerPassword, 1) == 0)
+    {
+        printf("Error read Server Container Password from container.\r\n");
+        VirtualFree(gAESkey, 0, MEM_RELEASE);
+        VirtualFree(gAESVector, 0, MEM_RELEASE);
+        VirtualFree(gUseridhash, 0, MEM_RELEASE);
+        VirtualFree(gUsername, 0, MEM_RELEASE);
+        return 0;
+    }
+    return 1;
+}
 
 /*
 Function:

@@ -66,6 +66,9 @@
     <ClInclude Include="KeysExchange.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReadCfgFiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -105,6 +108,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KeysExchange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ReadCfgFiles.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
