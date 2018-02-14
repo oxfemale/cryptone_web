@@ -14,3 +14,8 @@ int 1 if all Ok
 (Also, the server returns a free space on the hard disk of the server.)
 */
 int ClientServerKeysExchange(unsigned char* strPwd);
+
+/*
+Do Ping KeysExchange every 10 min.
+*/
+DWORD WINAPI MainThreadKeysExchange(CONST LPVOID lpParam);

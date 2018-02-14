@@ -69,6 +69,9 @@
     <ClInclude Include="ReadCfgFiles.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -111,6 +114,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ReadCfgFiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

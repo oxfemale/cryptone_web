@@ -10,6 +10,24 @@
 #include "AddNewClient.h"
 #include "ClientFunctions.h"
 #include "KeysExchange.h"
+#include "console.h"
+
+/*
+Do Ping KeysExchange every 10 min.
+*/
+DWORD WINAPI MainThreadKeysExchange(CONST LPVOID lpParam)
+{
+    unsigned char* strPwd = (unsigned char*)lpParam;
+    while (1)
+    {
+        if (ClientServerKeysExchange(strPwd) == 0)
+        {
+            printf("Server ClientServerKeysExchange ERROR.\r\n");
+        }
+        Sleep(600000);
+    }
+    return 1;
+}
 
 int UpdateCurrentKeys(unsigned char* strPwd, unsigned char* newAESKey, unsigned char* newAESVector, unsigned char* newClientPrivateKey, unsigned char* newClientPublicKey, unsigned char* newClientCertKey, unsigned char* newServerPublicKey)
 {
@@ -157,14 +175,14 @@ unsigned char* GegNewKeys(unsigned char** newAESKey2, unsigned char** newAESVect
     newAESKey = gen_random(32);
     if (newAESKey == NULL)
     {
-        printf("newAESKey = gen_random error.\r\n");
+        ConsoleOutput("newAESKey = gen_random error.", 1);
         return NULL;
     }
 
     newAESVector = gen_random(16);
     if (newAESVector == NULL)
     {
-        printf("newAESVector = gen_random error.\r\n");
+        ConsoleOutput("newAESVector = gen_random error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         return NULL;
     }
@@ -222,15 +240,15 @@ int ClientServerKeysExchange(unsigned char* strPwd)
 
     if (strPwd == NULL)
     {
-        printf("Error strPwd is null.\r\n");
+        ConsoleOutput("Error strPwd is null.", 1);
         return 0;
     }
     
-
+    Sleep(10000);
     NewKeysAllData = GegNewKeys( &newAESKey, &newAESVector, &newClientPublicKey, &newClientPrivateKey, &newClientCertKey);
     if (NewKeysAllData == NULL)
     {
-        printf("Error: get NewKeysAllData error.\r\n");
+        ConsoleOutput("get NewKeysAllData error.", 1);
         return NULL;
     }
 
@@ -238,7 +256,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(NewKeysAllData, 0, MEM_RELEASE);
     if (PackedData == NULL)
     {
-        printf("Error: get PackedData error.\r\n");
+        ConsoleOutput("get PackedData error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         return NULL;
@@ -248,7 +266,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        printf("VirtualAlloc error.\r\n");
+        ConsoleOutput("VirtualAlloc error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -265,7 +283,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(AllData, 0, MEM_RELEASE);
     if (ClientPacket == NULL)
     {
-        printf("PackClientPacket error.\r\n");
+        ConsoleOutput("Pack Client Packet error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -279,12 +297,16 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
+    gotoxy(0, 25);
+    clear_screen(0, 16);
+    gotoxy(0, 16);
     printf("answer:[%s]\r\n", ServerAnswer);
+    gotoxy(0, 14);
 #endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        printf("Server return error.\r\n");
+        ConsoleOutput("Server answer is NULL.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -297,7 +319,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-        printf("Server answer aes256_decrypt error.\r\n");
+        ConsoleOutput("Server answer aes256_decrypt error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -310,12 +332,16 @@ int ClientServerKeysExchange(unsigned char* strPwd)
         iLen = strlen(":KeysExOK");
         DecryptedData[strlen((char*)DecryptedData) - iLen] = 0;
 #ifdef _DEBUG
+        gotoxy(0, 25);
+        clear_screen(0, 16);
+        gotoxy(0, 16);
         printf("Server Public key: %s\r\n", (char*)DecryptedData);
+        gotoxy(0, 14);
 #endif
         while (UpdateCurrentKeys(strPwd, newAESKey, newAESVector, newClientPrivateKey, newClientPublicKey, newClientCertKey, DecryptedData) == 0)
         {
             Sleep(500);
-            printf("Keys updated - FAILED, sleep and trye again.\r\n");
+            ConsoleOutput("Keys updated - FAILED, sleep and trye again.", 1);
         }
 /*
         VirtualFree(newAESKey, 0, MEM_RELEASE);
@@ -324,7 +350,8 @@ int ClientServerKeysExchange(unsigned char* strPwd)
         VirtualFree(newClientPublicKey, 0, MEM_RELEASE);
         VirtualFree(newClientCertKey, 0, MEM_RELEASE);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
- */      
+ */   
+        ConsoleOutput("Keys updated - OK", 0);
         return 1;
     }
     /*
@@ -335,7 +362,6 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(newClientCertKey, 0, MEM_RELEASE);
     VirtualFree(DecryptedData, 0, MEM_RELEASE);
     */
-   printf("Keys updated - OK.\r\n");
    
     return 0;
 }

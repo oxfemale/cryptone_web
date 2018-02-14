@@ -18,6 +18,7 @@ telegram: https://t.me/BelousovaAlisa
 #include "ClientFunctions.h"
 #include "ReadCfgFiles.h"
 #include "KeysExchange.h"
+#include "console.h"
 #pragma comment (lib, "Wininet.lib")
 
 int SetMenu()
@@ -25,45 +26,67 @@ int SetMenu()
     char iSelect[2] = {0};
     for (;;)
     {
-                printf("Menu for user[%s]:\r\n1 - Get subclients list.\r\n2 - Set client alias.\r\n3 - Upload File.\r\nq - Exit from program.\r\nselect: ", gUsername);
-                iSelect[0] = _getch();
-                if (iSelect[0] == '1')
-                {
-                    printf("%c\r\n", iSelect[0]);
-                    GetSubclientsList();
-                    continue;
-                }
-                if (iSelect[0] == '2')
-                {
-                    printf("%c\r\n", iSelect[0]);
-                    SetSubclientsAlias();
-                    continue;
-                }
-                
-                if ( iSelect[0] == 3 )
-                {
-                    printf("\r\nCancel and exit.\r\n");
-                    return 0;
-                }
-                if (iSelect[0] == 26)
-                {
-                    printf("\r\nCancel and exit.\r\n");
-                    return 0;
-                }
-                if (iSelect[0] == 13)
-                {
-                    printf("\r\nCancel and exit.\r\n");
-                    return 0;
-                }
-                if (iSelect[0] == 'q')
-                {
-                    printf("%c\r\n", iSelect[0]);
-                    printf("\r\nExit.\r\n");
-                    return 0;
-                }
+        gotoxy(200, 200);
+        clear_screen(0, 0);
 
-                printf("\r\n");
-    }
+        gotoxy(0, 2);
+        printf("Menu for user [%s]:\r\n", gUsername);
+        printf("0 - Online subclients list.\r\n");
+        printf("1 - Get all subclients list.\r\n");
+        printf("2 - Set client alias.\r\n");
+        printf("3 - Upload File.\r\n");
+        printf("q - Exit from program.\r\n");
+        iSelect[0] = _getch();
+        
+        if (iSelect[0] == '0')
+        {
+            printf("%c\r\n", iSelect[0]);
+            GetSubclientsListOnline();
+            printf("press any key to continue...");
+            _getch();
+            continue;
+        }
+        if (iSelect[0] == '1')
+        {
+            printf("%c\r\n", iSelect[0]);
+            GetSubclientsList();
+            printf("press any key to continue...");
+            _getch();
+            continue;
+        }
+        if (iSelect[0] == '2')
+        {
+            printf("%c\r\n", iSelect[0]);
+            SetSubclientsAlias();
+            printf("press any key to continue...");
+            _getch();
+            continue;
+        }
+                
+        if ( iSelect[0] == 3 )
+        {
+            printf("\r\nCancel and exit.\r\n");
+            return 0;
+        }
+        if (iSelect[0] == 26)
+        {
+            printf("\r\nCancel and exit.\r\n");
+            return 0;
+        }
+        if (iSelect[0] == 13)
+        {
+            printf("\r\nCancel and exit.\r\n");
+            return 0;
+        }
+        if (iSelect[0] == 'q')
+        {
+            printf("%c\r\n", iSelect[0]);
+            printf("\r\nExit.\r\n");
+            return 0;
+        }
+
+        printf("\r\n");
+}
 return 0;
 }
 
@@ -81,6 +104,8 @@ int _tmain(int argc, _TCHAR* argv[])
     gServerPassword = NULL;
 
 
+    clear_screen(0,0);
+    gotoxy(0,2);
 
     hModuleCRYPT = LoadLibraryA(cryptone);
     if (hModuleCRYPT == NULL)
@@ -156,15 +181,27 @@ int _tmain(int argc, _TCHAR* argv[])
 				return 0;
 			}else{
 				printf("Reggged user.\r\n");
-				
-				if ( ClientPingServer( Servername, strPwd ) == 0 )
-				{
-					printf("Server ping ERROR.\r\n");
-					return 0;
-				}
-				printf("Server ping OK.\r\n");
                 SetKeysMem(strPwd);
-                ClientServerKeysExchange(strPwd);
+                //printf("\r\n");
+                ClientPingServer();
+                //printf("\r\n");
+				HANDLE hPingThread = CreateThread(0, 0, &MainThreadPing, 0, 0, 0);
+                if (hPingThread == NULL)
+                {
+                    printf("Error Start ping server.\r\n");
+                    return 0;
+                }
+                CloseHandle(hPingThread);
+                
+                HANDLE hKeysThread = CreateThread(0, 0, &MainThreadKeysExchange, strPwd, 0, 0);
+                if (hPingThread == NULL)
+                {
+                    printf("Error Start ClientServerKeysExchange thread.\r\n");
+                    return 0;
+                }
+                CloseHandle(hKeysThread);
+
+                //ClientServerKeysExchange(strPwd);
                 //SetKeysMem(strPwd);
                 SetMenu();
 				return 1;
@@ -186,9 +223,28 @@ int _tmain(int argc, _TCHAR* argv[])
 			printf("Registration Ok\r\nCrypt and close program container.\r\n");
             strPwd = (unsigned char*)AskContainerPassword();
             if (strPwd == NULL) return 0;
-            ClientPingServer(Servername, strPwd);
+            
             SetKeysMem(strPwd);
-            ClientServerKeysExchange(strPwd);
+            printf("\r\n");
+            ClientPingServer();
+            printf("\r\n");
+            HANDLE hPingThread = CreateThread(0, 0, &MainThreadPing, 0, 0, 0);
+            if (hPingThread == NULL)
+            {
+                printf("Error Start ping server.\r\n");
+                return 0;
+            }
+            CloseHandle(hPingThread);
+
+            //ClientServerKeysExchange(strPwd);
+            HANDLE hKeysThread = CreateThread(0, 0, &MainThreadKeysExchange, strPwd, 0, 0);
+            if (hPingThread == NULL)
+            {
+                printf("Error Start ClientServerKeysExchange thread.\r\n");
+                return 0;
+            }
+            CloseHandle(hKeysThread);
+
             //SetKeysMem(strPwd);
             SetMenu();
 

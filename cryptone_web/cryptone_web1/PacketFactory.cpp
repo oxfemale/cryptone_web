@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globalvars.h"
 #include "PacketFactory.h"
+#include "console.h"
 
 /*
 Description of function:
@@ -34,7 +35,7 @@ char* PackData(unsigned char* AllData)
 
 	if (ZippedChars == NULL)
 	{
-		printf("compress_string error.\r\n");
+        ConsoleOutput("compress_string error.", 1);
 		return NULL;
 	}
 
@@ -43,7 +44,7 @@ char* PackData(unsigned char* AllData)
 
 	if (hexed == NULL)
 	{
-		printf("char2charHex error.\r\n");
+        ConsoleOutput("char2charHex error.", 1);
 		return NULL;
 	}
 	return hexed;
@@ -91,7 +92,7 @@ unsigned char* DecryptServerPacket( char* ServerAnswer, unsigned char* AESKey, u
 	
 	if (debase64 == NULL)
 	{
-		printf("Server answer base64Decode error.\r\n");
+        ConsoleOutput("Server answer base64Decode error.", 1);
 		return NULL;
 	}
 
@@ -100,17 +101,21 @@ unsigned char* DecryptServerPacket( char* ServerAnswer, unsigned char* AESKey, u
 	VirtualFree(debase64, 0, MEM_RELEASE);
 	if (unZippedChars == NULL)
 	{
-		printf("Server answer decompress_string error.\r\n");
+        ConsoleOutput("Server answer decompress_string error.", 1);
 		return NULL;
 	}
-
+    if (unzippedLen == 0)
+    {
+        ConsoleOutput("Server answer size is 0.", 1);
+        return NULL;
+    }
 	sLen = unzippedLen;
 	debase64 = NULL;
 	iLen = base64Decode(unZippedChars, sLen, &debase64);
 	VirtualFree(unZippedChars, 0, MEM_RELEASE);
 	if (debase64 == NULL)
 	{
-		printf("Server answer base64Decode error.\r\n");
+        ConsoleOutput("Server answer base64Decode error.", 1);
 		return NULL;
 	}
 
@@ -171,7 +176,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (cpp_cipher == NULL)
 	{
-		printf("aes256_encrypt error.\r\n");
+        ConsoleOutput("aes256_encrypt error.", 1);
 		return NULL;
 	}
 
@@ -180,7 +185,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (base64str == NULL)
 	{
-		printf("base64Encode error.\r\n");
+        ConsoleOutput("base64Encode error.", 1);
 		return NULL;
 	}
 
@@ -188,7 +193,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 	AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
 	if (AllData == NULL)
 	{
-		printf("VirtualAlloc error.\r\n");
+        ConsoleOutput("VirtualAlloc error.", 1);
 		VirtualFree(base64str, 0, MEM_RELEASE);
 		return NULL;
 	}
@@ -203,7 +208,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (ZippedChars == NULL)
 	{
-		printf("compress_string error.\r\n");
+        ConsoleOutput("compress_string error.", 1);
 		return NULL;
 	}
 
@@ -212,7 +217,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (hexed == NULL)
 	{
-		printf("char2charHex error.\r\n");
+        ConsoleOutput("char2charHex error.", 1);
 		return NULL;
 	}
 
@@ -220,7 +225,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 	AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
 	if (AllData == NULL)
 	{
-		printf("VirtualAlloc error.\r\n");
+        ConsoleOutput("VirtualAlloc error.", 1);
 		VirtualFree(hexed, 0, MEM_RELEASE);
 		return NULL;
 	}

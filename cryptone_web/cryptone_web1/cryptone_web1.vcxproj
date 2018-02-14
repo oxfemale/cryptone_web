@@ -85,6 +85,7 @@
     <ClInclude Include="AskPasswords.h" />
     <ClInclude Include="AskUsername.h" />
     <ClInclude Include="ClientFunctions.h" />
+    <ClInclude Include="console.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="cryptone_web.h" />
     <ClInclude Include="globalvars.h" />
@@ -104,6 +105,7 @@
     <ClCompile Include="AskPasswords.cpp" />
     <ClCompile Include="AskUsername.cpp" />
     <ClCompile Include="ClientFunctions.cpp" />
+    <ClCompile Include="console.cpp" />
     <ClCompile Include="Container.cpp" />
     <ClCompile Include="cryptone_web.cpp" />
     <ClCompile Include="http.cpp" />

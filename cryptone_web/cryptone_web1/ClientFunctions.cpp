@@ -10,6 +10,125 @@
 #include "AddNewClient.h"
 #include "ClientFunctions.h"
 #include "SystemInfo.h"
+#include "console.h"
+
+
+/*
+Function:
+The function to get a online list of subclients for this user.
+If user offline 180 sec - user is offline.
+
+vars:
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+(Also, the server returns a free space on the hard disk of the server.)
+*/
+int GetSubclientsListOnline()
+{
+    unsigned char* AllData = NULL;
+    int iLen = 0;
+    unsigned char* ClientPacket = NULL;
+    char* ServerAnswer = NULL;
+    unsigned char* DecryptedData = NULL;
+    char* uList = "000";
+
+    ConsoleOutput("Start online userlist.", 0);
+
+    while (gUpdateKeys == 1)
+    {
+        Sleep(300);
+    }
+    gUpdateKeys = 1;
+
+
+    iLen = strlen((char*)gServerPassword) + strlen(uList) + 64;
+    AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
+    if (AllData == NULL)
+    {
+        ConsoleOutput("VirtualAlloc error.", 1);
+        gUpdateKeys = 0;
+        return NULL;
+    }
+
+    //clear_data:SubCommand
+    _snprintf((char*)AllData, (iLen - 4), "%s:%s:olist", (char*)gServerPassword, uList);
+
+    ClientPacket = PackClientPacket(AllData, gUseridhash, gAESkey, gAESVector, "job");
+    VirtualFree(AllData, 0, MEM_RELEASE);
+    if (ClientPacket == NULL)
+    {
+        ConsoleOutput("PackC lient Packet error.", 1);
+        gUpdateKeys = 0;
+        return NULL;
+    }
+
+    //Send Packet to Server
+    ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
+    //printf("ClientPacket:[%s]\r\n", ClientPacket);
+#ifdef _DEBUG
+    gotoxy(0, 25);
+    clear_screen(0, 16);
+    gotoxy(0, 16);
+    printf("answer:[%s]\r\n", ServerAnswer);
+    gotoxy(0, 14);
+#endif
+    VirtualFree(ClientPacket, 0, MEM_RELEASE);
+    if (ServerAnswer == NULL)
+    {
+        ConsoleOutput("Server return error.", 1);
+        gUpdateKeys = 0;
+        return 0;
+    }
+
+    DecryptedData = DecryptServerPacket(ServerAnswer, gAESkey, gAESVector);
+    VirtualFree(ServerAnswer, 0, MEM_RELEASE);
+    if (DecryptedData == NULL)
+    {
+        ConsoleOutput("Server answer aes256_decrypt error.", 1);
+        gUpdateKeys = 0;
+        return 0;
+    }
+    if (strstr((char*)DecryptedData, ":olist"))
+    {
+        //DecryptedData[strlen((char*)DecryptedData) - 6] = 0;
+        gotoxy(0, 25);
+        clear_screen(0, 16);
+        gotoxy(0, 16);
+        printf("Online clients %s\r\n", (char*)DecryptedData);
+        gotoxy(0, 14);
+        VirtualFree(DecryptedData, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
+        return 1;
+    }
+    gUpdateKeys = 0;
+#ifdef _DEBUG
+    gotoxy(0, 25);
+    clear_screen(0, 16);
+    gotoxy(0, 16);
+    printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
+    gotoxy(0, 14);
+#endif
+    return 0;
+}
+
+/*
+Do Ping Server every 60 sec.
+*/
+DWORD WINAPI MainThreadPing(CONST LPVOID lpParam)
+{
+    //unsigned char* strPwd = (unsigned char*)lpParam;
+    while (1)
+    {
+        if (ClientPingServer() == 0)
+        {
+            ConsoleOutput("Server ping ERROR.", 1);
+        }
+        Sleep(180000);
+    }
+    return 1;
+}
 
 /*
 Function:
@@ -18,95 +137,59 @@ And so it sends information about the client: Computer name, PC User name, last 
 Also, the server returns a free space on the hard disk of the server.
 
 vars:
-Servername - server name for registration
-strPwd - Container password
 
 return:
 int 0 - FAILED
 int 1 if all Ok
 (Also, the server returns a free space on the hard disk of the server.)
 */
-int ClientPingServer(char* Servername, unsigned char* strPwd)
+int ClientPingServer( )
 {
     unsigned char* AllData = NULL;
     int iLen = 0;
-    unsigned char *AESKey = NULL;
-    unsigned char *ClientUseridhash = NULL;
-    unsigned char *AESVector = NULL;
-    unsigned char *Username = NULL;
-    unsigned char *ServerContainerPassword = NULL;
     unsigned char* SystemInfo = NULL;
     unsigned char* ClientPacket = NULL;
     char* PackedData = NULL;
     char* ServerAnswer = NULL;
     unsigned char* DecryptedData = NULL;
 
-    if (strPwd == NULL)
-    {
-        printf("Error strPwd is null.\r\n");
-        return 0;
-    }
-    if (Servername == NULL)
-    {
-        printf("Error Servername is null.\r\n");
-        return 0;
-    }
     while (gUpdateKeys == 1)
     {
         Sleep(300);
     }
     gUpdateKeys = 1;
 
-    if (ReadContainer(strPwd, 5, &AESKey, 1) == 0)
+    if (gUseridhash == NULL)
     {
-        printf("Error read AESKey from container.\r\n");
-        gUpdateKeys = 0;
+        ConsoleOutput("gUseridhash is null.", 1);
         return 0;
     }
-    if (ReadContainer(strPwd, 8, &AESVector, 1) == 0)
+    if (gServerPassword == NULL)
     {
-        printf("Error read AESVector from container.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        gUpdateKeys = 0;
+        ConsoleOutput("gServerPassword is null.", 1);
         return 0;
     }
-    if (ReadContainer(strPwd, 7, &ClientUseridhash, 1) == 0)
+    if (gServername == NULL)
     {
-        printf("Error read Client Userid hash from container.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        gUpdateKeys = 0;
+        ConsoleOutput("gServername is null.", 1);
         return 0;
     }
-    if (ReadContainer(strPwd, 6, &Username, 1) == 0)
+    if (gAESkey == NULL)
     {
-        printf("Error read Username from container.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(ClientUseridhash, 0, MEM_RELEASE);
-        gUpdateKeys = 0;
+        ConsoleOutput("gAESkey is null.", 1);
         return 0;
     }
-    if (ReadContainer(strPwd, 9, &ServerContainerPassword, 1) == 0)
+    if (gAESVector == NULL)
     {
-        printf("Error read Server Container Password from container.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(ClientUseridhash, 0, MEM_RELEASE);
-        VirtualFree(Username, 0, MEM_RELEASE);
-        gUpdateKeys = 0;
+        ConsoleOutput("gAESVector is null.", 1);
         return 0;
     }
+
 
     SystemInfo = GetSystemInfo();
     if (SystemInfo == NULL)
     {
-        printf("Error: get SystemInfo error.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(ClientUseridhash, 0, MEM_RELEASE);
-        VirtualFree(Username, 0, MEM_RELEASE);
-        VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
+        ConsoleOutput("get SystemInfo error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -115,90 +198,82 @@ int ClientPingServer(char* Servername, unsigned char* strPwd)
     VirtualFree(SystemInfo, 0, MEM_RELEASE);
     if (PackedData == NULL)
     {
-        printf("Error: get PackedData error.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(ClientUseridhash, 0, MEM_RELEASE);
-        VirtualFree(Username, 0, MEM_RELEASE);
-        VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
+        ConsoleOutput("get PackedData error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
 
-    iLen = strlen((char*)ServerContainerPassword) + strlen(PackedData) + 64;
+    iLen = strlen((char*)gServerPassword) + strlen(PackedData) + 64;
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        printf("VirtualAlloc error.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(ClientUseridhash, 0, MEM_RELEASE);
-        VirtualFree(Username, 0, MEM_RELEASE);
-        VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
+        ConsoleOutput("VirtualAlloc error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
 
     //printf("ServerContainerPassword: %s\r\n", ServerContainerPassword);
     //clear_data:SubCommand
-    _snprintf((char*)AllData, (iLen - 4), "%s:%s:ping", (char*)ServerContainerPassword, PackedData);
+    _snprintf((char*)AllData, (iLen - 4), "%s:%s:ping", (char*)gServerPassword, PackedData);
     VirtualFree(PackedData, 0, MEM_RELEASE);
-    VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
 
-    ClientPacket = PackClientPacket(AllData, ClientUseridhash, AESKey, AESVector, "job");
+    ClientPacket = PackClientPacket(AllData, gUseridhash, gAESkey, gAESVector, "job");
     VirtualFree(AllData, 0, MEM_RELEASE);
-    VirtualFree(ClientUseridhash, 0, MEM_RELEASE);
+
     if (ClientPacket == NULL)
     {
-        printf("PackClientPacket error.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(Username, 0, MEM_RELEASE);
+        ConsoleOutput("Pack Client Packet error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
 
 
     //Send Packet to Server
-    ServerAnswer = SendPacketData(Servername, (char*)ClientPacket);
+    ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
+    gotoxy(0, 25);
+    clear_screen(0, 16);
+    gotoxy(0, 16);
     printf("answer:[%s]\r\n", ServerAnswer);
+    gotoxy(0, 14);
 #endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        printf("Server return error.\r\n");
-        VirtualFree(AESKey, 0, MEM_RELEASE);
-        VirtualFree(AESVector, 0, MEM_RELEASE);
-        VirtualFree(Username, 0, MEM_RELEASE);
+        ConsoleOutput("Server return NULL.", 1);
         gUpdateKeys = 0;
         return 0;
     }
 
-    DecryptedData = DecryptServerPacket(ServerAnswer, AESKey, AESVector);
+    DecryptedData = DecryptServerPacket(ServerAnswer, gAESkey, gAESVector);
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
-    VirtualFree(AESKey, 0, MEM_RELEASE);
-    VirtualFree(AESVector, 0, MEM_RELEASE);
-    VirtualFree(Username, 0, MEM_RELEASE);
+
     if (DecryptedData == NULL)
     {
-        printf("Server answer aes256_decrypt error.\r\n");
+        ConsoleOutput("Server answer aes256_decrypt error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
     if (strstr((char*)DecryptedData, ":pong"))
     {
-        DecryptedData[strlen((char*)DecryptedData) - 4] = 0;
-        printf("Server Free Disk space: %s\r\n", (char*)DecryptedData);
+        DecryptedData[strlen((char*)DecryptedData) - 5] = 0;
+        gotoxy(0, 1);
+        clear_screen(0, 0);
+        gotoxy(0, 0);
+        printf("Ping Server, server disk space: %s", (char*)DecryptedData);
+        gotoxy(0, 14);
+
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
         gUpdateKeys = 0;
         return 1;
     }
+    VirtualFree(DecryptedData, 0, MEM_RELEASE);
     //printf("Decrypted data:\r\n%s\r\n", DecryptedData);
     gUpdateKeys = 0;
     return 0;
 }
+
 
 /*
 Function:
@@ -254,7 +329,11 @@ int GetSubclientsList( )
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
+    gotoxy(0, 25);
+    clear_screen(0, 16);
+    gotoxy(0, 16);
     printf("answer:[%s]\r\n", ServerAnswer);
+    //gotoxy(0, 14);
 #endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
@@ -275,14 +354,22 @@ int GetSubclientsList( )
     if (strstr((char*)DecryptedData, ":ulist"))
     {
         //DecryptedData[strlen((char*)DecryptedData) - 4] = 0;
+        gotoxy(0, 25);
+        clear_screen(0, 16);
+        gotoxy(0, 16);
         printf("Subclients %s\r\n", (char*)DecryptedData);
+        //gotoxy(0, 14);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
         gUpdateKeys = 0;
         return 1;
     }
     gUpdateKeys = 0;
 #ifdef _DEBUG
+    gotoxy(0, 25);
+    clear_screen(0, 16);
+    gotoxy(0, 16);
     printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
+    //gotoxy(0, 14);
 #endif
     return 0;
 }
