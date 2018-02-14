@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globalvars.h"
 #include "Container.h"
+#include "console.h"
 
 /*
 Function:
@@ -15,12 +16,12 @@ int 1 if all Ok
 */
 int SetKeysMem(unsigned char* strPwd)
 {
+	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Set Keys to memory.", 0);
     if (strPwd == NULL)
     {
-        printf("Error strPwd is null.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error strPwd is null.", 1);
         return 0;
     }
-
     while (gUpdateKeys == 1)
     {
         Sleep(300);
@@ -55,21 +56,21 @@ int SetKeysMem(unsigned char* strPwd)
 
     if (ReadContainer(strPwd, 5, &gAESkey, 1) == 0)
     {
-        printf("Error read AESKey from container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error read AESKey from container.", 1);
         gUpdateKeys = 0;
         return 0;
     }
 
     if (ReadContainer(strPwd, 8, &gAESVector, 1) == 0)
     {
-        printf("Error read AESVector from container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error read AESVector from container.", 1);
         VirtualFree(gAESkey, 0, MEM_RELEASE);
         gUpdateKeys = 0;
         return 0;
     }
     if (ReadContainer(strPwd, 7, &gUseridhash, 1) == 0)
     {
-        printf("Error read Client Userid hash from container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error read Client Userid hash from container.", 1);
         VirtualFree(gAESkey, 0, MEM_RELEASE);
         VirtualFree(gAESVector, 0, MEM_RELEASE);
         gUpdateKeys = 0;
@@ -77,7 +78,7 @@ int SetKeysMem(unsigned char* strPwd)
     }
     if (ReadContainer(strPwd, 6, &gUsername, 1) == 0)
     {
-        printf("Error read Username from container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error read Username from container.", 1);
         VirtualFree(gAESkey, 0, MEM_RELEASE);
         VirtualFree(gAESVector, 0, MEM_RELEASE);
         VirtualFree(gUseridhash, 0, MEM_RELEASE);
@@ -86,7 +87,7 @@ int SetKeysMem(unsigned char* strPwd)
     }
     if (ReadContainer(strPwd, 9, &gServerPassword, 1) == 0)
     {
-        printf("Error read Server Container Password from container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error read Server Container Password from container.", 1);
         VirtualFree(gAESkey, 0, MEM_RELEASE);
         VirtualFree(gAESVector, 0, MEM_RELEASE);
         VirtualFree(gUseridhash, 0, MEM_RELEASE);

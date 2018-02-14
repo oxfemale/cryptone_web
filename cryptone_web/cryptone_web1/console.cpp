@@ -10,14 +10,35 @@
 #include "AddNewClient.h"
 #include "ClientFunctions.h"
 #include "SystemInfo.h"
+#include "console.h"
 
-void ConsoleOutput( char* Info, int flag )
+void ConsoleOutput(char* cLogFileName, char* cLogFuncName, int iCodeLine, char* cInfo, int flag)
 {
-    gotoxy(0, 1);
-    clear_screen(0, 0);
-    gotoxy(0, 0);
-    if (flag == 0 )printf("INFO: %s", Info);
-    if (flag == 1) printf("ERROR: %s", Info);
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+
+	gotoxy(0, 1);
+	clear_screen(0, 0);
+	gotoxy(0, 0);
+	if (flag == 0)
+	{
+		printf("INFO: %s", cInfo);
+		if (gLogFile != NULL)
+		{
+			fprintf(gLogFile, "TIME: %d:%.2d:%.2d %.2d:%.2d:%.2d INFO %s->%s() line %d: %s\r\n", 1900 + timeinfo->tm_year, 1+timeinfo->tm_mon, timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, cLogFileName, cLogFuncName, iCodeLine, cInfo);
+		}
+	}
+	if (flag == 1)
+	{
+		printf( "ERROR: %s", cInfo);
+		if (gLogFile != NULL)
+		{
+			fprintf(gLogFile, "TIME: %d:%.2d:%.2d %.2d:%.2d:%.2d ERROR: function: %s->%s() line %d: %s\r\n", 1900 + timeinfo->tm_year, 1+timeinfo->tm_mon, timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec, asctime(timeinfo), cLogFileName, cLogFuncName, iCodeLine, cInfo);
+		}
+	}
     gotoxy(0, 14);
     return;
 }
@@ -41,7 +62,7 @@ void gotoxy(int x, int y)
 {
     static HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
     static COORD WritePos;
-    WritePos.X = x; //-1 for borland compatibility??
+    WritePos.X = x;
     WritePos.Y = y;
     SetConsoleCursorPosition(hStdOut, WritePos);
 }

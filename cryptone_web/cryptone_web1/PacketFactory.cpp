@@ -35,7 +35,7 @@ char* PackData(unsigned char* AllData)
 
 	if (ZippedChars == NULL)
 	{
-        ConsoleOutput("compress_string error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"compress_string error.", 1);
 		return NULL;
 	}
 
@@ -44,7 +44,7 @@ char* PackData(unsigned char* AllData)
 
 	if (hexed == NULL)
 	{
-        ConsoleOutput("char2charHex error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"char2charHex error.", 1);
 		return NULL;
 	}
 	return hexed;
@@ -92,7 +92,7 @@ unsigned char* DecryptServerPacket( char* ServerAnswer, unsigned char* AESKey, u
 	
 	if (debase64 == NULL)
 	{
-        ConsoleOutput("Server answer base64Decode error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer base64Decode error.", 1);
 		return NULL;
 	}
 
@@ -101,12 +101,12 @@ unsigned char* DecryptServerPacket( char* ServerAnswer, unsigned char* AESKey, u
 	VirtualFree(debase64, 0, MEM_RELEASE);
 	if (unZippedChars == NULL)
 	{
-        ConsoleOutput("Server answer decompress_string error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer decompress_string error.", 1);
 		return NULL;
 	}
     if (unzippedLen == 0)
     {
-        ConsoleOutput("Server answer size is 0.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer size is 0.", 1);
         return NULL;
     }
 	sLen = unzippedLen;
@@ -115,7 +115,7 @@ unsigned char* DecryptServerPacket( char* ServerAnswer, unsigned char* AESKey, u
 	VirtualFree(unZippedChars, 0, MEM_RELEASE);
 	if (debase64 == NULL)
 	{
-        ConsoleOutput("Server answer base64Decode error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer base64Decode error.", 1);
 		return NULL;
 	}
 
@@ -176,7 +176,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (cpp_cipher == NULL)
 	{
-        ConsoleOutput("aes256_encrypt error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"aes256_encrypt error.", 1);
 		return NULL;
 	}
 
@@ -185,7 +185,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (base64str == NULL)
 	{
-        ConsoleOutput("base64Encode error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"base64Encode error.", 1);
 		return NULL;
 	}
 
@@ -193,7 +193,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 	AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
 	if (AllData == NULL)
 	{
-        ConsoleOutput("VirtualAlloc error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
 		VirtualFree(base64str, 0, MEM_RELEASE);
 		return NULL;
 	}
@@ -208,7 +208,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (ZippedChars == NULL)
 	{
-        ConsoleOutput("compress_string error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"compress_string error.", 1);
 		return NULL;
 	}
 
@@ -217,7 +217,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 
 	if (hexed == NULL)
 	{
-        ConsoleOutput("char2charHex error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"char2charHex error.", 1);
 		return NULL;
 	}
 
@@ -225,7 +225,7 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 	AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
 	if (AllData == NULL)
 	{
-        ConsoleOutput("VirtualAlloc error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
 		VirtualFree(hexed, 0, MEM_RELEASE);
 		return NULL;
 	}

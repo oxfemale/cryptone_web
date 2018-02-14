@@ -24,6 +24,7 @@ extern unsigned char * gUseridhash;
 extern unsigned char * gUsername;
 extern unsigned char * gServerPassword;
 
+extern FILE * gLogFile;
 
 extern int gUpdateKeys;
 

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globalvars.h"
 #include "http.h"
+#include "console.h"
 
 /*
 Read any size data from http server

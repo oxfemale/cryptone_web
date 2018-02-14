@@ -11,6 +11,7 @@
 #include "ClientFunctions.h"
 #include "SystemInfo.h"
 #include "ReadCfgFiles.h"
+#include "console.h"
 
 /*
 Function:
@@ -31,7 +32,7 @@ int SetDefaultAESVector()
     iv128 = (unsigned char*)VirtualAlloc(NULL, 16, MEM_COMMIT, PAGE_READWRITE);
     if (iv128 == NULL)
     {
-        printf("Error VirtualAlloc for iv128 buffer.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error VirtualAlloc for iv128 buffer.", 1);
         return 0;
     }
 
@@ -58,8 +59,24 @@ int SetDefaultAESVector()
         fclose(pFile);
     }
     else {
-        strcat_s((char*)iv128, 16, (char*)iv128Old);
-    }
+        //strcat_s((char*)iv128, 16, (char*)iv128Old);
+		iv128[0] = iv128Old[0];
+		iv128[1] = iv128Old[1];
+		iv128[2] = iv128Old[2];
+		iv128[3] = iv128Old[3];
+		iv128[4] = iv128Old[4];
+		iv128[5] = iv128Old[5];
+		iv128[6] = iv128Old[6];
+		iv128[7] = iv128Old[7];
+		iv128[8] = iv128Old[8];
+		iv128[9] = iv128Old[9];
+		iv128[10] = iv128Old[10];
+		iv128[11] = iv128Old[11];
+		iv128[12] = iv128Old[12];
+		iv128[13] = iv128Old[13];
+		iv128[14] = iv128Old[14];
+		iv128[15] = iv128Old[15];
+	}
 
     return 1;
 }
@@ -85,7 +102,7 @@ int ServersList()
     Servername = (char*)VirtualAlloc(NULL, 256, MEM_COMMIT, PAGE_READWRITE);
     if (Servername == NULL)
     {
-        printf("Error VirtualAlloc for Servername buffer.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error VirtualAlloc for Servername buffer.", 1);
         return 0;
     }
 

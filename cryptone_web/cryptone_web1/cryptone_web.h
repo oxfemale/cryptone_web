@@ -4,6 +4,8 @@ unsigned char * iv128 = NULL;
 unsigned char* strUsername = NULL;
 char* gServername = NULL;
 
+FILE * gLogFile = NULL;
+
 unsigned char * gAESkey = NULL;
 unsigned char * gAESVector = NULL;
 unsigned char * gClientPublic = NULL;

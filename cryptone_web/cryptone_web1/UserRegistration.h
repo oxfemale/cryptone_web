@@ -78,4 +78,15 @@ Servername - server name for registration
 return:
 1 if all Ok or 0 if Error
 */
+/*
+Function:
+User Registration function.
+If the user is registered, you can add a new client to the existing user and call TempUserRegistration()
+
+vars:
+Servername - server name for registration
+
+return:
+1 if all Ok or 0 if Error
+*/
 int NewUserRegistration(char* Servername);

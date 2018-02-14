@@ -22,7 +22,7 @@ DWORD WINAPI MainThreadKeysExchange(CONST LPVOID lpParam)
     {
         if (ClientServerKeysExchange(strPwd) == 0)
         {
-            printf("Server ClientServerKeysExchange ERROR.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server ClientServerKeysExchange ERROR.", 1);
         }
         Sleep(600000);
     }
@@ -175,14 +175,14 @@ unsigned char* GegNewKeys(unsigned char** newAESKey2, unsigned char** newAESVect
     newAESKey = gen_random(32);
     if (newAESKey == NULL)
     {
-        ConsoleOutput("newAESKey = gen_random error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"newAESKey = gen_random error.", 1);
         return NULL;
     }
 
     newAESVector = gen_random(16);
     if (newAESVector == NULL)
     {
-        ConsoleOutput("newAESVector = gen_random error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"newAESVector = gen_random error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         return NULL;
     }
@@ -240,7 +240,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
 
     if (strPwd == NULL)
     {
-        ConsoleOutput("Error strPwd is null.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error strPwd is null.", 1);
         return 0;
     }
     
@@ -248,7 +248,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     NewKeysAllData = GegNewKeys( &newAESKey, &newAESVector, &newClientPublicKey, &newClientPrivateKey, &newClientCertKey);
     if (NewKeysAllData == NULL)
     {
-        ConsoleOutput("get NewKeysAllData error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get NewKeysAllData error.", 1);
         return NULL;
     }
 
@@ -256,7 +256,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(NewKeysAllData, 0, MEM_RELEASE);
     if (PackedData == NULL)
     {
-        ConsoleOutput("get PackedData error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get PackedData error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         return NULL;
@@ -266,7 +266,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        ConsoleOutput("VirtualAlloc error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -283,7 +283,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(AllData, 0, MEM_RELEASE);
     if (ClientPacket == NULL)
     {
-        ConsoleOutput("Pack Client Packet error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Pack Client Packet error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -306,7 +306,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        ConsoleOutput("Server answer is NULL.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer is NULL.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -319,7 +319,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-        ConsoleOutput("Server answer aes256_decrypt error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
@@ -341,7 +341,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
         while (UpdateCurrentKeys(strPwd, newAESKey, newAESVector, newClientPrivateKey, newClientPublicKey, newClientCertKey, DecryptedData) == 0)
         {
             Sleep(500);
-            ConsoleOutput("Keys updated - FAILED, sleep and trye again.", 1);
+            ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Keys updated - FAILED, sleep and trye again.", 1);
         }
 /*
         VirtualFree(newAESKey, 0, MEM_RELEASE);
@@ -351,7 +351,7 @@ int ClientServerKeysExchange(unsigned char* strPwd)
         VirtualFree(newClientCertKey, 0, MEM_RELEASE);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
  */   
-        ConsoleOutput("Keys updated - OK", 0);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Keys updated - OK", 0);
         return 1;
     }
     /*

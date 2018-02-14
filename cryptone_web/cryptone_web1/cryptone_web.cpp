@@ -103,7 +103,9 @@ int _tmain(int argc, _TCHAR* argv[])
     gUsername = NULL;
     gServerPassword = NULL;
 
-
+	gLogFile = fopen("logfile.txt", "ab");
+	
+	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start client.", 0);
     clear_screen(0,0);
     gotoxy(0,2);
 
@@ -111,29 +113,31 @@ int _tmain(int argc, _TCHAR* argv[])
     if (hModuleCRYPT == NULL)
     {
         printf("Error[%d] load [%s] dll\r\n", GetLastError(), cryptone);
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Load library cryptone.dll error.", 1);
         return 0;
     }
 
     if (SetDefaultAESVector() == 0)
     {
-        printf("Error set default aes vector.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Error set default aes vector.", 1);
         return 0;
     }
 
     if (ServersList() == 0)
     {
-        printf("Error set servername.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Error set default servername.", 1);
         return 0;
     }
     Servername = gServername;
 
     if( doPingServer(Servername) == 1 )
 	{
-		printf("Server is Alive.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Server is Alive.", 0);
 		bestType = SelectBestHttpTraffic(Servername);
 	}else
 	{
 		printf("Server is Down.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Server is Down.", 1);
 		return 0;
 	}
 
@@ -154,7 +158,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				fclose(pFile);
 				fclose(pasFile);
-				printf("Error VirtualAlloc for password buffer.\r\n");
+				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Error VirtualAlloc for password buffer.", 1);
 				return 0;
 			}
 			memset( strPwd, '-', 32 );
@@ -167,20 +171,18 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			if( TestCfgVars( strPwd ) == 0 )
 			{
-				printf("Error test Container vars.\r\n");
+				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Error test Container vars. Container keys is deleted, please, goto login/register again.", 1);
 				remove( "file.cfg" );
-				printf("Container keys is deleted, please, goto login/register again.\r\n");
 				return 0;
 			}
 		
 			if ( isRegUser( strPwd ) == 0 )
 			{
-				printf("Not reggged user.\r\n");
 				remove( "file.cfg" );
-				printf("Container keys is deleted, please, goto login/register again.\r\n");
+				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Not reggged user. Container keys is deleted, please, goto login/register again.", 1);
 				return 0;
 			}else{
-				printf("Reggged user.\r\n");
+				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Found reggged user.", 0);
                 SetKeysMem(strPwd);
                 //printf("\r\n");
                 ClientPingServer();
@@ -189,6 +191,7 @@ int _tmain(int argc, _TCHAR* argv[])
                 if (hPingThread == NULL)
                 {
                     printf("Error Start ping server.\r\n");
+					ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start thread ping server error.", 1);
                     return 0;
                 }
                 CloseHandle(hPingThread);
@@ -196,7 +199,7 @@ int _tmain(int argc, _TCHAR* argv[])
                 HANDLE hKeysThread = CreateThread(0, 0, &MainThreadKeysExchange, strPwd, 0, 0);
                 if (hPingThread == NULL)
                 {
-                    printf("Error Start ClientServerKeysExchange thread.\r\n");
+					ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start Client/Server Keys Exchange thread error.", 1);
                     return 0;
                 }
                 CloseHandle(hKeysThread);
@@ -208,19 +211,20 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 		}else{
 			//remove( "file.cfg" );
-			printf("Error: Container password is wrong or container file is bad.\r\nDelete file.cfg if not remebers container password.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Container password is wrong or container file is bad.", 1);
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Delete file.cfg if not remebers container password.", 1);
 			return 0;
 		}
 	}else
 	{
 		if ( NewUserRegistration( Servername ) == 0 )
 		{
-			printf("Registration error.\r\n");
-            		remove("file.cfg");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Registration error.", 1);
+            remove("file.cfg");
 			return 0;
 		}else
 		{
-			printf("Registration Ok\r\nCrypt and close program container.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Registration Ok, cfg file container crypted.", 0);
             strPwd = (unsigned char*)AskContainerPassword();
             if (strPwd == NULL) return 0;
             
@@ -231,7 +235,7 @@ int _tmain(int argc, _TCHAR* argv[])
             HANDLE hPingThread = CreateThread(0, 0, &MainThreadPing, 0, 0, 0);
             if (hPingThread == NULL)
             {
-                printf("Error Start ping server.\r\n");
+				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start thread ping server error.", 1);
                 return 0;
             }
             CloseHandle(hPingThread);
@@ -240,7 +244,7 @@ int _tmain(int argc, _TCHAR* argv[])
             HANDLE hKeysThread = CreateThread(0, 0, &MainThreadKeysExchange, strPwd, 0, 0);
             if (hPingThread == NULL)
             {
-                printf("Error Start ClientServerKeysExchange thread.\r\n");
+				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start Client/Server Keys Exchange thread error.", 1);
                 return 0;
             }
             CloseHandle(hKeysThread);

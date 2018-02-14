@@ -2,6 +2,7 @@
 #include "PacketFactory.h"
 #include "globalvars.h"
 #include "SystemInfo.h"
+#include "console.h"
 
 BOOL UpTime(SYSTEMTIME *pstBootTime)
 {
@@ -52,20 +53,20 @@ unsigned char* GetSystemInfo()
 	
     if (!UpTime(&stBootTime))
     {
-        printf("Error: get UpTime error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get UpTime error.", 1);
         return NULL;
     }
 
 	ComputerName = (char*)VirtualAlloc(NULL, bufCharCount + 4, MEM_COMMIT, PAGE_READWRITE);
     if (ComputerName == NULL)
     {
-        printf("Error: get VirtualAlloc:ComputerName error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get VirtualAlloc:ComputerName error.", 1);
         return NULL;
     }
     bufCharCount = 32767;
 	if (!GetComputerNameA(ComputerName, &bufCharCount))
 	{
-        printf("Error: get GetComputerName error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get GetComputerName error.", 1);
 		VirtualFree(ComputerName, 0, MEM_RELEASE);
 		return NULL;
 	}
@@ -73,13 +74,13 @@ unsigned char* GetSystemInfo()
 	UserName = (char*)VirtualAlloc(NULL, bufCharCount + 4, MEM_COMMIT, PAGE_READWRITE);
     if (UserName == NULL)
     {
-        printf("Error: get VirtualAlloc:UserName error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get VirtualAlloc:UserName error.", 1);
         return NULL;
     }
     bufCharCount = 32767;
 	if (!GetUserNameA(UserName, &bufCharCount))
 	{
-        printf("Error: get GetUserName error: %d\r\n", GetLastError());
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get GetUserName error.", 1);
 		VirtualFree(ComputerName, 0, MEM_RELEASE);
 		VirtualFree(UserName, 0, MEM_RELEASE);
 		return NULL;
@@ -89,7 +90,7 @@ unsigned char* GetSystemInfo()
 	SysInfoData = (unsigned char*)VirtualAlloc(NULL, bufCharCount+4, MEM_COMMIT, PAGE_READWRITE);
 	if (SysInfoData == NULL)
 	{
-        printf("Error: get VirtualAlloc:SysInfoData error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get VirtualAlloc:SysInfoData error.", 1);
 		VirtualFree(ComputerName, 0, MEM_RELEASE);
 		VirtualFree(UserName, 0, MEM_RELEASE);
 		return NULL;

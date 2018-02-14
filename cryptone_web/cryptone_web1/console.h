@@ -5,4 +5,4 @@ void clear_screen(int x, int y);
 
 void gotoxy(int x, int y);
 
-void ConsoleOutput(char* Info, int flag);
+void ConsoleOutput(char* cLogFileName, char* cLogFuncName, int iCodeLine, char* cInfo, int flag);

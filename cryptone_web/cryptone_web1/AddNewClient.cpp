@@ -8,6 +8,7 @@
 #include "http.h"
 #include "PacketFactory.h"
 #include "AddNewClient.h"
+#include "console.h"
 
 /*
 function:
@@ -50,14 +51,14 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     AESKeyNew = gen_random(32);
     if (AESKeyNew == NULL)
     {
-        printf("AESKeyNew = gen_random error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"AESKeyNew = gen_random error.", 1);
         return NULL;
     }
 
     AESVectorNew = gen_random(16);
     if (AESVectorNew == NULL)
     {
-        printf("AESVectorNew = gen_random error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"AESVectorNew = gen_random error.", 1);
         VirtualFree(AESKey, 0, MEM_RELEASE);
         return NULL;
     }
@@ -65,7 +66,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     ServerContainerPassword = gen_random(32);
     if (ServerContainerPassword == NULL)
     {
-        printf("ServerContainerPassword = gen_random error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"ServerContainerPassword = gen_random error.", 1);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
         return NULL;
@@ -74,7 +75,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     MasterPassword = AskMasterPassword();
     if (MasterPassword == NULL)
     {
-        printf("AskMasterPassword error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"AskMasterPassword error.", 1);
         VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
@@ -85,7 +86,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        printf("VirtualAlloc error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
         VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
@@ -109,13 +110,17 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     //Send Packet to Server
     ServerAnswer = SendPacketData(Servername, (char*)ClientPacket);
 #ifdef _DEBUG
+	gotoxy(0, 25);
+	clear_screen(0, 16);
+	gotoxy(0, 16);
     printf("ServerAnswer:\r\n%s\r\n", ServerAnswer);
+	gotoxy(0, 14);
 #endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
 
     if (ServerAnswer == NULL)
     {
-        printf("Server return error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return NULL.", 1);
         VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
@@ -126,7 +131,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-        printf("Server answer aes256_decrypt error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
@@ -141,7 +146,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
         if (AllData == NULL)
         {
-            printf("VirtualAlloc error.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
             VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
             VirtualFree(AESVectorNew, 0, MEM_RELEASE);
@@ -161,7 +166,11 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
 
         unsigned char* ServerPublicKey = AllData;
 #ifdef _DEBUG
+		gotoxy(0, 25);
+		clear_screen(0, 16);
+		gotoxy(0, 16);
         printf("Server Public key: %s\r\n", ServerPublicKey );
+		gotoxy(0, 14);
 #endif
 
         std::string aesk = "";
@@ -171,7 +180,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         if (UpdateContainer(strPwd, BeginServerPublicKey, EndServerPublicKey, (unsigned char*)aesk.c_str()) == 0)
         {
             aesk.clear();
-            printf("Error update container, container deleted.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error update container, container deleted.", 1);
             remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
@@ -189,7 +198,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         if (UpdateContainer(strPwd, BeginContainerPass, EndContainerPass, (unsigned char*)aesk.c_str()) == 0)
         {
             aesk.clear();
-            printf("Error update container, container deleted.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error update container, container deleted.", 1);
             remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
@@ -206,7 +215,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         if (UpdateContainer(strPwd, BeginAESVector, EndAESVector, (unsigned char*)aesk.c_str()) == 0)
         {
             aesk.clear();
-            printf("Error update container, container deleted.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error update container, container deleted.", 1);
             remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
@@ -224,7 +233,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         if (UpdateContainer(strPwd, BeginAESKey, EndAESKey, (unsigned char*)aesk.c_str()) == 0)
         {
             aesk.clear();
-            printf("Error update container, container deleted.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error update container, container deleted.", 1);
             remove("file.cfg");
             VirtualFree(ServerPublicKey, 0, MEM_RELEASE);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
@@ -235,7 +244,7 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         }
         aesk.clear();
 
-        printf("Registered, all data saved to container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Registered, all data saved to container.", 0);
 
         return 1;
     }
@@ -266,7 +275,7 @@ int AddNewClientToUser(char* Servername)
     unsigned char* AESvsUSER = NULL;
     char iSelect[2] = { 0 };
 
-    printf("TMP user registration:\r\n");
+	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"TMP user registration.", 0);
 
     AESvsUSER = FirstHandshake(Servername, 1);
     if (AESvsUSER == NULL)
@@ -287,7 +296,7 @@ int AddNewClientToUser(char* Servername)
     unsigned char *UserID = NULL;
     if (FirstHandshakeSaveData(AESvsUSER, strPwd, &AESVector, &AESKey, &UserID) == 0)
     {
-        printf("Error parse/save handshake data\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error parse/save handshake data.", 1);
         VirtualFree(strUsername, 0, MEM_RELEASE);
         VirtualFree(AESvsUSER, 0, MEM_RELEASE);
         return 0;
@@ -296,7 +305,7 @@ int AddNewClientToUser(char* Servername)
     unsigned char *KeyPub = NULL;
     if (ReadContainer(strPwd, 2, &KeyPub, 0) == 0)
     {
-        printf("Error read Public key from container.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error read Public key from container.", 1);
         VirtualFree(AESKey, 0, MEM_RELEASE);
         VirtualFree(AESVector, 0, MEM_RELEASE);
         VirtualFree(UserID, 0, MEM_RELEASE);
@@ -307,7 +316,7 @@ int AddNewClientToUser(char* Servername)
 
     if (AddNewClientRegHandshake(UserID, AESKey, AESVector, KeyPub, Servername, strPwd) == 0)
     {
-        printf("Final registration Error, Saving step to container, please try late with your container password.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Final registration Error, Saving step to container, please try late with your container password.", 1);
         std::string aesk = "";
         char* step1 = "---BIGIN FINAL ERROR----";
         char* step2 = "---END FINAL ERROR----";
@@ -317,7 +326,7 @@ int AddNewClientToUser(char* Servername)
         aesk.append(step2, strlen(step2));
         if (UpdateContainer(strPwd, step1, step2, (unsigned char*)aesk.c_str()) == 0)
         {
-            printf("Error safe final step registration, container deleted, please try register again.\r\n");
+			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error safe final step registration, container deleted, please try register again.", 1);
             remove("file.cfg");
             aesk.clear();
             VirtualFree(KeyPub, 0, MEM_RELEASE);

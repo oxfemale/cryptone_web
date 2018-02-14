@@ -34,7 +34,7 @@ int GetSubclientsListOnline()
     unsigned char* DecryptedData = NULL;
     char* uList = "000";
 
-    ConsoleOutput("Start online userlist.", 0);
+    ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Start online userlist.", 0);
 
     while (gUpdateKeys == 1)
     {
@@ -47,7 +47,7 @@ int GetSubclientsListOnline()
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        ConsoleOutput("VirtualAlloc error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -59,7 +59,7 @@ int GetSubclientsListOnline()
     VirtualFree(AllData, 0, MEM_RELEASE);
     if (ClientPacket == NULL)
     {
-        ConsoleOutput("PackC lient Packet error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"PackC lient Packet error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -77,7 +77,7 @@ int GetSubclientsListOnline()
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        ConsoleOutput("Server return error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -86,7 +86,7 @@ int GetSubclientsListOnline()
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-        ConsoleOutput("Server answer aes256_decrypt error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -102,6 +102,7 @@ int GetSubclientsListOnline()
         gUpdateKeys = 0;
         return 1;
     }
+	VirtualFree(DecryptedData, 0, MEM_RELEASE);
     gUpdateKeys = 0;
 #ifdef _DEBUG
     gotoxy(0, 25);
@@ -123,7 +124,7 @@ DWORD WINAPI MainThreadPing(CONST LPVOID lpParam)
     {
         if (ClientPingServer() == 0)
         {
-            ConsoleOutput("Server ping ERROR.", 1);
+            ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server ping ERROR.", 1);
         }
         Sleep(180000);
     }
@@ -161,27 +162,27 @@ int ClientPingServer( )
 
     if (gUseridhash == NULL)
     {
-        ConsoleOutput("gUseridhash is null.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"gUseridhash is null.", 1);
         return 0;
     }
     if (gServerPassword == NULL)
     {
-        ConsoleOutput("gServerPassword is null.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"gServerPassword is null.", 1);
         return 0;
     }
     if (gServername == NULL)
     {
-        ConsoleOutput("gServername is null.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"gServername is null.", 1);
         return 0;
     }
     if (gAESkey == NULL)
     {
-        ConsoleOutput("gAESkey is null.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"gAESkey is null.", 1);
         return 0;
     }
     if (gAESVector == NULL)
     {
-        ConsoleOutput("gAESVector is null.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"gAESVector is null.", 1);
         return 0;
     }
 
@@ -189,7 +190,7 @@ int ClientPingServer( )
     SystemInfo = GetSystemInfo();
     if (SystemInfo == NULL)
     {
-        ConsoleOutput("get SystemInfo error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get SystemInfo error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -198,7 +199,7 @@ int ClientPingServer( )
     VirtualFree(SystemInfo, 0, MEM_RELEASE);
     if (PackedData == NULL)
     {
-        ConsoleOutput("get PackedData error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"get PackedData error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -207,7 +208,7 @@ int ClientPingServer( )
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        ConsoleOutput("VirtualAlloc error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -222,7 +223,7 @@ int ClientPingServer( )
 
     if (ClientPacket == NULL)
     {
-        ConsoleOutput("Pack Client Packet error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Pack Client Packet error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -241,7 +242,7 @@ int ClientPingServer( )
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        ConsoleOutput("Server return NULL.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return NULL.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -251,7 +252,7 @@ int ClientPingServer( )
 
     if (DecryptedData == NULL)
     {
-        ConsoleOutput("Server answer aes256_decrypt error.", 1);
+        ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -295,7 +296,7 @@ int GetSubclientsList( )
     unsigned char* DecryptedData = NULL;
     char* uList = "000";
     
-    printf("Start userlist.\r\n");
+	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Start userlist.", 0);
 
     while (gUpdateKeys == 1)
     {
@@ -308,7 +309,7 @@ int GetSubclientsList( )
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        printf("VirtualAlloc error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -320,7 +321,7 @@ int GetSubclientsList( )
     VirtualFree(AllData, 0, MEM_RELEASE);
     if (ClientPacket == NULL)
     {
-        printf("PackClientPacket error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Pack Client Packet error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -338,7 +339,7 @@ int GetSubclientsList( )
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        printf("Server return error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return NULL.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -347,7 +348,7 @@ int GetSubclientsList( )
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-        printf("Server answer aes256_decrypt error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -363,6 +364,7 @@ int GetSubclientsList( )
         gUpdateKeys = 0;
         return 1;
     }
+	VirtualFree(DecryptedData, 0, MEM_RELEASE);
     gUpdateKeys = 0;
 #ifdef _DEBUG
     gotoxy(0, 25);
@@ -436,7 +438,7 @@ int SetSubclientsAlias()
     AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
-        printf("VirtualAlloc error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -449,7 +451,7 @@ int SetSubclientsAlias()
     VirtualFree(AllData, 0, MEM_RELEASE);
     if (ClientPacket == NULL)
     {
-        printf("PackClientPacket error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Pack Client Packet error.", 1);
         gUpdateKeys = 0;
         return NULL;
     }
@@ -458,12 +460,15 @@ int SetSubclientsAlias()
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
+	gotoxy(0, 25);
+	clear_screen(0, 16);
+	gotoxy(0, 16);
     printf("answer:[%s]\r\n", ServerAnswer);
 #endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
     if (ServerAnswer == NULL)
     {
-        printf("Server return error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
@@ -472,20 +477,28 @@ int SetSubclientsAlias()
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-        printf("Server answer aes256_decrypt error.\r\n");
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         gUpdateKeys = 0;
         return 0;
     }
     if (strstr((char*)DecryptedData, ":alias"))
     {
         DecryptedData[strlen((char*)DecryptedData) - 6] = 0;
+		gotoxy(0, 1);
+		clear_screen(0, 0);
+		gotoxy(0, 0);
         printf("New alias is set to: %s\r\n", (char*)DecryptedData);
+		gotoxy(0, 14);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
         gUpdateKeys = 0;
         return 1;
     }
+	VirtualFree(DecryptedData, 0, MEM_RELEASE);
     gUpdateKeys = 0;
 #ifdef _DEBUG
+	gotoxy(0, 25);
+	clear_screen(0, 16);
+	gotoxy(0, 16);
     printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
 #endif
     return 0;
