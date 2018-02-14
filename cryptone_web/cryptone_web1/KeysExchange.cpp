@@ -91,11 +91,46 @@ int UpdateCurrentKeys(unsigned char* strPwd, unsigned char* newAESKey, unsigned 
     }
     aesk.clear();
 
+    if ( gAESkey != NULL )
+    {
+        VirtualFree(gAESkey, 0, MEM_RELEASE);
+        gAESkey = NULL;
+    }
     gAESkey = newAESKey;
+
+    if (gAESVector != NULL)
+    {
+        VirtualFree(gAESVector, 0, MEM_RELEASE);
+        gAESVector = NULL;
+    }
     gAESVector = newAESVector;
+
+    if (gClientPrivate != NULL)
+    {
+        VirtualFree(gClientPrivate, 0, MEM_RELEASE);
+        gClientPrivate = NULL;
+    }
     gClientPrivate = newClientPrivateKey;
+
+    if (gClientPublic != NULL)
+    {
+        VirtualFree(gClientPublic, 0, MEM_RELEASE);
+        gClientPublic = NULL;
+    }
     gClientPublic = newClientPublicKey;
+
+    if (gClientCert != NULL)
+    {
+        VirtualFree(gClientCert, 0, MEM_RELEASE);
+        gClientCert = NULL;
+    }
     gClientCert = newClientCertKey;
+
+    if (gServerPublic != NULL)
+    {
+        VirtualFree(gServerPublic, 0, MEM_RELEASE);
+        gServerPublic = NULL;
+    }
     gServerPublic = newServerPublicKey;
 
 
@@ -282,20 +317,24 @@ int ClientServerKeysExchange(unsigned char* strPwd)
             Sleep(500);
             printf("Keys updated - FAILED, sleep and trye again.\r\n");
         }
+/*
         VirtualFree(newAESKey, 0, MEM_RELEASE);
         VirtualFree(newAESVector, 0, MEM_RELEASE);
         VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
         VirtualFree(newClientPublicKey, 0, MEM_RELEASE);
         VirtualFree(newClientCertKey, 0, MEM_RELEASE);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
+ */      
         return 1;
     }
+    /*
     VirtualFree(newAESKey, 0, MEM_RELEASE);
     VirtualFree(newAESVector, 0, MEM_RELEASE);
     VirtualFree(newClientPrivateKey, 0, MEM_RELEASE);
     VirtualFree(newClientPublicKey, 0, MEM_RELEASE);
     VirtualFree(newClientCertKey, 0, MEM_RELEASE);
     VirtualFree(DecryptedData, 0, MEM_RELEASE);
+    */
    printf("Keys updated - OK.\r\n");
    
     return 0;

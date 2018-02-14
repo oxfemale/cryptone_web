@@ -21,9 +21,42 @@ int SetKeysMem(unsigned char* strPwd)
         return 0;
     }
 
+    while (gUpdateKeys == 1)
+    {
+        Sleep(300);
+    }
+    gUpdateKeys = 1;
+
+    if (gAESkey != NULL)
+    {
+        VirtualFree(gAESkey, 0, MEM_RELEASE);
+        gAESkey = NULL;
+    }
+    if (gAESVector != NULL)
+    {
+        VirtualFree(gAESVector, 0, MEM_RELEASE);
+        gAESVector = NULL;
+    }
+    if (gUseridhash != NULL)
+    {
+        VirtualFree(gUseridhash, 0, MEM_RELEASE);
+        gUseridhash = NULL;
+    }
+    if (gUsername != NULL)
+    {
+        VirtualFree(gUsername, 0, MEM_RELEASE);
+        gUsername = NULL;
+    }
+    if (gServerPassword != NULL)
+    {
+        VirtualFree(gServerPassword, 0, MEM_RELEASE);
+        gServerPassword = NULL;
+    }
+
     if (ReadContainer(strPwd, 5, &gAESkey, 1) == 0)
     {
         printf("Error read AESKey from container.\r\n");
+        gUpdateKeys = 0;
         return 0;
     }
 
@@ -31,6 +64,7 @@ int SetKeysMem(unsigned char* strPwd)
     {
         printf("Error read AESVector from container.\r\n");
         VirtualFree(gAESkey, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
         return 0;
     }
     if (ReadContainer(strPwd, 7, &gUseridhash, 1) == 0)
@@ -38,6 +72,7 @@ int SetKeysMem(unsigned char* strPwd)
         printf("Error read Client Userid hash from container.\r\n");
         VirtualFree(gAESkey, 0, MEM_RELEASE);
         VirtualFree(gAESVector, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
         return 0;
     }
     if (ReadContainer(strPwd, 6, &gUsername, 1) == 0)
@@ -46,6 +81,7 @@ int SetKeysMem(unsigned char* strPwd)
         VirtualFree(gAESkey, 0, MEM_RELEASE);
         VirtualFree(gAESVector, 0, MEM_RELEASE);
         VirtualFree(gUseridhash, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
         return 0;
     }
     if (ReadContainer(strPwd, 9, &gServerPassword, 1) == 0)
@@ -55,8 +91,10 @@ int SetKeysMem(unsigned char* strPwd)
         VirtualFree(gAESVector, 0, MEM_RELEASE);
         VirtualFree(gUseridhash, 0, MEM_RELEASE);
         VirtualFree(gUsername, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
         return 0;
     }
+    gUpdateKeys = 0;
     return 1;
 }
 

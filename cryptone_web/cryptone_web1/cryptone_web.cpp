@@ -74,8 +74,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	unsigned char* strPwd = NULL;
 	FILE* pFile = NULL;
     char* Servername = NULL;
+    gAESkey = NULL;
+    gAESVector = NULL;
+    gUseridhash = NULL;
+    gUsername = NULL;
+    gServerPassword = NULL;
 
-   
+
 
     hModuleCRYPT = LoadLibraryA(cryptone);
     if (hModuleCRYPT == NULL)
@@ -160,7 +165,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				printf("Server ping OK.\r\n");
                 SetKeysMem(strPwd);
                 ClientServerKeysExchange(strPwd);
-                SetKeysMem(strPwd);
+                //SetKeysMem(strPwd);
                 SetMenu();
 				return 1;
 			}
@@ -184,7 +189,7 @@ int _tmain(int argc, _TCHAR* argv[])
             ClientPingServer(Servername, strPwd);
             SetKeysMem(strPwd);
             ClientServerKeysExchange(strPwd);
-            SetKeysMem(strPwd);
+            //SetKeysMem(strPwd);
             SetMenu();
 
 			return 1;
