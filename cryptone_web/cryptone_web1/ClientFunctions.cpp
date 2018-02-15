@@ -12,6 +12,129 @@
 #include "SystemInfo.h"
 #include "console.h"
 
+/*
+Function:
+The function delete old subclients.
+
+vars:
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+(Also, the server returns a free space on the hard disk of the server.)
+*/
+int DeleteOldSubclients()
+{
+    unsigned char* AllData = NULL;
+    int iLen = 0;
+    unsigned char* ClientPacket = NULL;
+    char* ServerAnswer = NULL;
+    unsigned char* DecryptedData = NULL;
+    char iSelect[4] = {0};
+    char uList[10] = {0};
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Start delete old subclients function.", 0);
+
+    for (;;)
+    {
+        gotoxy(0, 20);
+        clear_screen(0, 15);
+        gotoxy(0, 15);
+        printf("Choose which SubClients to delete:\r\n\t1 - Delete SubClients in the last month.\r\n\t2 - Delete all SubClients, but not this one.\r\nselect: ");
+        iSelect[0] = _getch();
+        if (iSelect[0] == '1')
+        {
+            uList[0] = 'M';
+            uList[1] = 'O';
+            uList[2] = 'N';
+            break;
+        }
+        if (iSelect[0] == '2')
+        {
+            uList[0] = 'A';
+            uList[1] = 'L';
+            uList[2] = 'L';
+            break;
+        }
+    }
+
+    while (gUpdateKeys == 1)
+    {
+        Sleep(300);
+    }
+    gUpdateKeys = 1;
+
+
+    iLen = strlen((char*)gServerPassword) + strlen(uList) + 64;
+    AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
+    if (AllData == NULL)
+    {
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "VirtualAlloc error.", 1);
+        gUpdateKeys = 0;
+        return NULL;
+    }
+
+    //clear_data:SubCommand
+    _snprintf((char*)AllData, (iLen - 4), "%s:%s:dlist", (char*)gServerPassword, uList);
+
+    ClientPacket = PackClientPacket(AllData, gUseridhash, gAESkey, gAESVector, "job");
+    VirtualFree(AllData, 0, MEM_RELEASE);
+    if (ClientPacket == NULL)
+    {
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "PackC lient Packet error.", 1);
+        gUpdateKeys = 0;
+        return NULL;
+    }
+
+    //Send Packet to Server
+    ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
+    //printf("ClientPacket:[%s]\r\n", ClientPacket);
+#ifdef _DEBUG
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
+    printf("answer:[%s]\r\n", ServerAnswer);
+    gotoxy(0, 14);
+#endif
+    VirtualFree(ClientPacket, 0, MEM_RELEASE);
+    if (ServerAnswer == NULL)
+    {
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Server return error.", 1);
+        gUpdateKeys = 0;
+        return 0;
+    }
+
+    DecryptedData = DecryptServerPacket(ServerAnswer, gAESkey, gAESVector);
+    VirtualFree(ServerAnswer, 0, MEM_RELEASE);
+    if (DecryptedData == NULL)
+    {
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Server answer aes256_decrypt error.", 1);
+        gUpdateKeys = 0;
+        return 0;
+    }
+    if (strstr((char*)DecryptedData, ":dlist"))
+    {
+        //DecryptedData[strlen((char*)DecryptedData) - 6] = 0;
+        gotoxy(0, 30);
+        clear_screen(0, 20);
+        gotoxy(0, 20);
+        printf("Deleted SubClients %s\r\n", (char*)DecryptedData);
+        gotoxy(0, 14);
+        VirtualFree(DecryptedData, 0, MEM_RELEASE);
+        gUpdateKeys = 0;
+        return 1;
+    }
+    VirtualFree(DecryptedData, 0, MEM_RELEASE);
+    gUpdateKeys = 0;
+#ifdef _DEBUG
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
+    printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
+    gotoxy(0, 14);
+#endif
+    return 0;
+}
 
 /*
 Function:

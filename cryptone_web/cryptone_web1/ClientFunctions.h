@@ -3,6 +3,19 @@
 
 /*
 Function:
+The function delete old subclients.
+
+vars:
+
+return:
+int 0 - FAILED
+int 1 if all Ok
+(Also, the server returns a free space on the hard disk of the server.)
+*/
+int DeleteOldSubclients();
+
+/*
+Function:
 The function to get a online list of subclients for this user.
 If user offline 60 sec - user is offline.
 

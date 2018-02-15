@@ -34,14 +34,22 @@ int SetMenu()
         gotoxy(0, 1);
         miniLogo();
         printf("Menu for user [%s]:\r\n", gUsername);
-        printf("0 - Online subclients list.\r\n");
-        printf("1 - Get all subclients list.\r\n");
-        printf("2 - Set client alias.\r\n");
-        printf("3 - Upload File.\r\n");
+        printf("0 - Online subclients list. \t1 - Get all subclients list. \t2 - Set client alias.\r\n");
+        printf("3 - Delete old offline subclients.\r\n");
+        printf("4 - Upload File.\r\n");
         printf("q - Exit from program.\r\n");
         iSelect[0] = _getch();
         
-        if (iSelect[0] == '0')
+        if (iSelect[0] == '3')
+        {
+            printf("%c\r\n", iSelect[0]);
+            DeleteOldSubclients();
+            printf("press any key to continue...");
+            _getch();
+            continue;
+        }
+
+        if (iSelect[0] == '3')
         {
             printf("%c\r\n", iSelect[0]);
             GetSubclientsListOnline();
