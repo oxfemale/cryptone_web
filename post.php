@@ -349,6 +349,38 @@ function FindUsernameByRegUserid ( $Userid )
 	return $DataForClient;
 }
 
+function CheckTimeOnline($lasttime)
+{
+
+ date_default_timezone_set("Europe/Moscow");
+ $mysqltime = date ("Y-m-d H:i:s");
+//echo "Current time: ".$mysqltime."\r\n";
+ $p_u = explode(" ", $lasttime);
+ $date_u = $p_u[0];
+ $time_u = $p_u[1];
+
+ $t_u = explode(":", $time_u);
+ $h_u = $t_u[0];
+ $m_u = $t_u[1];
+
+ $p_n = explode(" ", $mysqltime);
+ $date_n = $p_n[0];
+ $time_n = $p_n[1];
+ $t_n = explode(":", $time_n);
+ $h_n = $t_n[0];
+ $m_n = $t_n[1];
+ if($date_u == $date_n )
+ {
+	if($h_u == $h_n )
+	{
+		$cur_m = (int)$m_n -(int)$m_u;
+		if($cur_m <= 3 ) return 1;
+	}
+ }
+return 0;
+}
+
+
 function JobFromClient($data)
 {
 	$DataForClient = "ERROR: error";
@@ -414,6 +446,33 @@ function JobFromClient($data)
 		//if ($result) mysql_free_result($result);
 
 		$answer = ":ulist[".$userscount."]\r\n".$userlist;
+	}
+	if(strstr($job,"olist"))
+	{
+		$sql_users = "SELECT clientid, osversion, datetime, alias FROM ".$username." WHERE status=1";
+		$mysqltime = date ("Y-m-d H:i:s");
+	//$pieces = explode(":", $data);
+	//$Userid = $pieces[1];
+        //$CodedData = $pieces[2];
+
+		$result = mysql_query($sql_users);
+		if (!$result) return "Error userlist: " . mysql_error();
+		$userlist = "";
+		$userscount = 0;
+		while($row = mysql_fetch_array($result, MYSQL_ASSOC))
+		{
+        		$u_clientid = $row["clientid"];
+			if( strstr($u_clientid,$Userid) ) continue;
+			$u_datetime = $row["datetime"];
+			if ( CheckTimeOnline($u_datetime) == 0 ) continue;
+			$u_alias = $row["alias"];
+			$u_osversion = $row["osversion"];
+			$userlist = $userlist."ClientID: ".$u_clientid."\r\nAlias: ".$u_alias."\r\nLast login time: ".$u_datetime."\r\nOS Version: ".$u_osversion."\r\n-----\r\n";
+			$userscount++;
+    		}
+		//if ($result) mysql_free_result($result);
+
+		$answer = ":olist[".$userscount."]\r\n".$userlist;
 	}
 	if(strstr($job,"keys"))
 	{
