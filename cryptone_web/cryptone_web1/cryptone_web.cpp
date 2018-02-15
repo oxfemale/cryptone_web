@@ -26,11 +26,13 @@ int SetMenu()
     ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     char iSelect[2] = {0};
+    char* cLongLine = "                                          ";
+
     for (;;)
     {
-        gotoxy(2000, 2000);
-        clear_screen(0, 2);
-
+        gotoxy(35, 35);
+        clear_screen(0, 0);
+        printf("[Default server is %s ]",gServername);
         gotoxy(0, 1);
         miniLogo();
         printf("Menu for user [%s]:\r\n", gUsername);
@@ -44,16 +46,16 @@ int SetMenu()
         {
             printf("%c\r\n", iSelect[0]);
             DeleteOldSubclients();
-            printf("press any key to continue...");
+            printf("press any key to continue... %s", cLongLine);
             _getch();
             continue;
         }
 
-        if (iSelect[0] == '3')
+        if (iSelect[0] == '0')
         {
             printf("%c\r\n", iSelect[0]);
             GetSubclientsListOnline();
-            printf("press any key to continue...");
+            printf("press any key to continue... %s", cLongLine);
             _getch();
             continue;
         }
@@ -61,7 +63,7 @@ int SetMenu()
         {
             printf("%c\r\n", iSelect[0]);
             GetSubclientsList();
-            printf("press any key to continue...");
+            printf("press any key to continue... %s", cLongLine);
             _getch();
             continue;
         }
@@ -69,7 +71,7 @@ int SetMenu()
         {
             printf("%c\r\n", iSelect[0]);
             SetSubclientsAlias();
-            printf("press any key to continue...");
+            printf("press any key to continue... %s", cLongLine);
             _getch();
             continue;
         }
