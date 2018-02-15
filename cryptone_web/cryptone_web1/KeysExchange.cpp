@@ -17,6 +17,8 @@ Do Ping KeysExchange every 10 min.
 */
 DWORD WINAPI MainThreadKeysExchange(CONST LPVOID lpParam)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     unsigned char* strPwd = (unsigned char*)lpParam;
     while (1)
     {
@@ -31,6 +33,8 @@ DWORD WINAPI MainThreadKeysExchange(CONST LPVOID lpParam)
 
 int UpdateCurrentKeys(unsigned char* strPwd, unsigned char* newAESKey, unsigned char* newAESVector, unsigned char* newClientPrivateKey, unsigned char* newClientPublicKey, unsigned char* newClientCertKey, unsigned char* newServerPublicKey)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     std::string aesk = "";
     while (gUpdateKeys == 1)
     {
@@ -166,6 +170,8 @@ unsigned char* GegNewKeys(unsigned char** newAESKey2, unsigned char** newAESVect
     unsigned char* newClientPrivateKey = NULL;
     unsigned char* newClientCertKey = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     GenRSAKeysToMem = (GenRSAKeysToMemExp)GetProcAddress(hModuleCRYPT, "GenRSAKeysToMem");
     if (GenRSAKeysToMem == NULL) return 0;
 
@@ -238,6 +244,8 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     char* ServerAnswer = NULL;
     unsigned char* DecryptedData = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (strPwd == NULL)
     {
         ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Error strPwd is null.", 1);
@@ -297,9 +305,9 @@ int ClientServerKeysExchange(unsigned char* strPwd)
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
-    gotoxy(0, 25);
-    clear_screen(0, 16);
-    gotoxy(0, 16);
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
     printf("answer:[%s]\r\n", ServerAnswer);
     gotoxy(0, 14);
 #endif
@@ -332,9 +340,9 @@ int ClientServerKeysExchange(unsigned char* strPwd)
         iLen = strlen(":KeysExOK");
         DecryptedData[strlen((char*)DecryptedData) - iLen] = 0;
 #ifdef _DEBUG
-        gotoxy(0, 25);
-        clear_screen(0, 16);
-        gotoxy(0, 16);
+        gotoxy(0, 30);
+        clear_screen(0, 20);
+        gotoxy(0, 20);
         printf("Server Public key: %s\r\n", (char*)DecryptedData);
         gotoxy(0, 14);
 #endif

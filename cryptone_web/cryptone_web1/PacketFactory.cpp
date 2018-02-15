@@ -23,6 +23,7 @@ char* PackData(unsigned char* AllData)
 	char* ZippedChars = NULL;
 	char* hexed = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
 	compress_stringC = (compress_stringCExp)GetProcAddress(hModuleCRYPT, "compress_stringC");
 	if (compress_stringC == NULL) return NULL;
@@ -76,6 +77,8 @@ unsigned char* DecryptServerPacket( char* ServerAnswer, unsigned char* AESKey, u
 	unsigned char* AllData = NULL;
 	unsigned char *DecryptedData = NULL;
 	char* unZippedChars = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
 	aes256_decryptC = (aes256_decryptCExp)GetProcAddress(hModuleCRYPT, "aes256_decryptC");
 	if (aes256_decryptC == NULL) return NULL;
@@ -158,6 +161,8 @@ unsigned char* PackClientPacket( unsigned char* ClientData, unsigned char* UserI
 	char* base64str = NULL;
 	char* ZippedChars = NULL;
 	char* hexed = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
 	aes256_encryptC = (aes256_encryptCExp)GetProcAddress(hModuleCRYPT, "aes256_encryptC");
 	if (aes256_encryptC == NULL) return NULL;

@@ -16,6 +16,8 @@ DWORD &dwAllByteRead - All bytes including newly received from the network
 */
 char* readNetData(HINTERNET hRequest, char* AllData, DWORD packetSize, DWORD &dwByteRead, DWORD &dwAllByteRead)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     char szData[4048] = { 0 };
     BOOL isRead = InternetReadFile(hRequest, szData, packetSize, &dwByteRead);
     if (isRead == FALSE || dwByteRead == 0)
@@ -82,6 +84,8 @@ char* SendHTTPSRequest_GET(bool secureFlag, char* server, char* page, char* para
 
     char* AllData = NULL;
     DWORD dwAllByteRead = 0;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     hInternet = InternetOpen(TEXT("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
     if (hInternet == NULL) return NULL;
@@ -236,13 +240,21 @@ int doPingServer(char* ServerName)
     char* getParams2 = "login=value1&password=test";
     char* pageParam1 = NULL;
     char* pageParam2 = "/cp2.php";
-
     DWORD dwCounter = 0;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     for (;;)
     {
         answer = SendHTTPSRequest_GET(secureFlag, ServerName, "/ping.php", getParams1, packetSize, addToHeader1, postData1);
         if (answer == NULL) return 0;
-        printf("%d %s\r\n", dwCounter++, answer);
+        //printf("%d %s\r\n", dwCounter++, answer);
+        gotoxy(0, 1);
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "\t[ Server is ", 4);
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, ServerName, 4);
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, " answer: ", 4);
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, answer, 4);
+        ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, " ]", 4);
         VirtualFree(answer, 0, MEM_RELEASE);
         Sleep(100);
         return 1;
@@ -276,6 +288,8 @@ int SelectBestHttpTraffic(char* CheckServer)
     char* pageParam2 = "/best.php";
     int bbProto = 0;
     char* pong = "pong";
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     answer = SendHTTPSRequest_GET(secureFlag, CheckServer, pageParam2, getParams2, packetSize, addToHeader1, postData1);
     if (answer != NULL)
@@ -365,6 +379,8 @@ char* - Server answer
 */
 char* SendPacketData(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (bestType == 1) return SendDataGET(ServerName, stringData);
     if (bestType == 2) return SendDataHEAD(ServerName, stringData);
     if (bestType == 3) return SendDataPOST(ServerName, stringData);
@@ -388,6 +404,8 @@ char* - Server answer
 */
 char* SendDataPOST(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (stringData == NULL) return NULL;
     if (ServerName == NULL) return NULL;
 
@@ -410,6 +428,8 @@ char* - Server answer
 */
 char* SendSSLDataPOST(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (stringData == NULL) return NULL;
     if (ServerName == NULL) return NULL;
 
@@ -432,6 +452,8 @@ char* - Server answer
 */
 char* SendDataGET(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (stringData == NULL) return NULL;
     if (ServerName == NULL) return NULL;
 
@@ -454,6 +476,8 @@ char* - Server answer
 */
 char* SendSSLDataGET(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (stringData == NULL) return NULL;
     if (ServerName == NULL) return NULL;
 
@@ -476,6 +500,8 @@ char* - Server answer
 */
 char* SendSSLDataHEAD(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (stringData == NULL) return NULL;
     if (ServerName == NULL) return NULL;
 
@@ -498,6 +524,8 @@ char* - Server answer
 */
 char* SendDataHEAD(char* ServerName, char* stringData)
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (stringData == NULL) return NULL;
     if (ServerName == NULL) return NULL;
 

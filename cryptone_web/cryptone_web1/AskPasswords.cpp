@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globalvars.h"
 #include "AskPasswords.h"
+#include "console.h"
 
 /*
 Function:
@@ -17,11 +18,20 @@ char* AskMasterPassword()
     if (AllData == NULL) return AllData;
     memset(AllData, '-', 32);
     int iCount = 0;
-    printf("Please input [MASTER] password maximum 32 symbols: ");
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
+    gotoxy(0, 30);
+    clear_screen(0, 15);
+    gotoxy(0, 15);
+    printf("[MASTER] password for all clients (max 32) or q for exit: ");
     do
     {
         AllData[iCount] = _getch();
         printf("%c", AllData[iCount]);
+        
+        if (AllData[iCount] == 'q') exit(0);
+
         if (AllData[iCount] == 3)
         {
             printf("\r\nCancel and exit.\r\n");
@@ -50,22 +60,41 @@ char* AskMasterPassword()
 Function:
 Asks the password for the crypto container, it stores the settings and important variables
 The maximum size of the crypto container password is 32 characters.
+
+var:
+char* Message - Addd text message for user
+
 return:
 NULL - FAILED
 char* - Password String
 */
-char* AskContainerPassword()
+char* AskContainerPassword(char* Message)
 {
     char* AllData = NULL;
     AllData = (char*)VirtualAlloc(NULL, 32, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL) return AllData;
     memset(AllData, '-', 32);
     int iCount = 0;
-    printf("Please input container password maximum 32 symbols: ");
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+    
+    gotoxy(0, 30);
+    clear_screen(0, 15);
+    gotoxy(0, 15);
+    if (Message == NULL)
+    {
+        printf("Container password (max 32)  or q for exit: ");
+    }
+    else {
+        printf("%s or q for exit: ", Message);
+    }
+    
     do
     {
         AllData[iCount] = _getch();
         printf("%c", AllData[iCount]);
+
+        if (AllData[iCount] == 'q') exit(0);
+
         if (AllData[iCount] == 3)
         {
             printf("\r\nCancel and exit.\r\n");
@@ -89,3 +118,4 @@ char* AskContainerPassword()
 
     return AllData;
 }
+

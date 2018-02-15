@@ -68,9 +68,9 @@ int GetSubclientsListOnline()
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
-    gotoxy(0, 25);
-    clear_screen(0, 16);
-    gotoxy(0, 16);
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
     printf("answer:[%s]\r\n", ServerAnswer);
     gotoxy(0, 14);
 #endif
@@ -93,9 +93,9 @@ int GetSubclientsListOnline()
     if (strstr((char*)DecryptedData, ":olist"))
     {
         //DecryptedData[strlen((char*)DecryptedData) - 6] = 0;
-        gotoxy(0, 25);
-        clear_screen(0, 16);
-        gotoxy(0, 16);
+        gotoxy(0, 30);
+        clear_screen(0, 20);
+        gotoxy(0, 20);
         printf("Online clients %s\r\n", (char*)DecryptedData);
         gotoxy(0, 14);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
@@ -105,9 +105,9 @@ int GetSubclientsListOnline()
 	VirtualFree(DecryptedData, 0, MEM_RELEASE);
     gUpdateKeys = 0;
 #ifdef _DEBUG
-    gotoxy(0, 25);
-    clear_screen(0, 16);
-    gotoxy(0, 16);
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
     printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
     gotoxy(0, 14);
 #endif
@@ -120,6 +120,7 @@ Do Ping Server every 60 sec.
 DWORD WINAPI MainThreadPing(CONST LPVOID lpParam)
 {
     //unsigned char* strPwd = (unsigned char*)lpParam;
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
     while (1)
     {
         if (ClientPingServer() == 0)
@@ -153,6 +154,8 @@ int ClientPingServer( )
     char* PackedData = NULL;
     char* ServerAnswer = NULL;
     unsigned char* DecryptedData = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     while (gUpdateKeys == 1)
     {
@@ -233,9 +236,9 @@ int ClientPingServer( )
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
-    gotoxy(0, 25);
-    clear_screen(0, 16);
-    gotoxy(0, 16);
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
     printf("answer:[%s]\r\n", ServerAnswer);
     gotoxy(0, 14);
 #endif
@@ -330,9 +333,9 @@ int GetSubclientsList( )
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
-    gotoxy(0, 25);
-    clear_screen(0, 16);
-    gotoxy(0, 16);
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
     printf("answer:[%s]\r\n", ServerAnswer);
     //gotoxy(0, 14);
 #endif
@@ -355,9 +358,9 @@ int GetSubclientsList( )
     if (strstr((char*)DecryptedData, ":ulist"))
     {
         //DecryptedData[strlen((char*)DecryptedData) - 4] = 0;
-        gotoxy(0, 25);
-        clear_screen(0, 16);
-        gotoxy(0, 16);
+        gotoxy(0, 30);
+        clear_screen(0, 20);
+        gotoxy(0, 20);
         printf("Subclients %s\r\n", (char*)DecryptedData);
         //gotoxy(0, 14);
         VirtualFree(DecryptedData, 0, MEM_RELEASE);
@@ -367,9 +370,9 @@ int GetSubclientsList( )
 	VirtualFree(DecryptedData, 0, MEM_RELEASE);
     gUpdateKeys = 0;
 #ifdef _DEBUG
-    gotoxy(0, 25);
-    clear_screen(0, 16);
-    gotoxy(0, 16);
+    gotoxy(0, 30);
+    clear_screen(0, 20);
+    gotoxy(0, 20);
     printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
     //gotoxy(0, 14);
 #endif
@@ -396,6 +399,8 @@ int SetSubclientsAlias()
     unsigned char* DecryptedData = NULL;
     char* ClientAlias = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     while (gUpdateKeys == 1)
     {
         Sleep(300);
@@ -407,6 +412,10 @@ int SetSubclientsAlias()
     if (ClientAlias == NULL) return 0;
     memset(ClientAlias, 0, 32);
     int iCount = 0;
+
+    gotoxy(0, 30);
+    clear_screen(0, 14);
+    gotoxy(0, 14);
     printf("Please input subclient alias 32 symbols max: ");
     do
     {
@@ -460,9 +469,9 @@ int SetSubclientsAlias()
     ServerAnswer = SendPacketData(gServername, (char*)ClientPacket);
     //printf("ClientPacket:[%s]\r\n", ClientPacket);
 #ifdef _DEBUG
-	gotoxy(0, 25);
-	clear_screen(0, 16);
-	gotoxy(0, 16);
+	gotoxy(0, 30);
+	clear_screen(0, 20);
+	gotoxy(0, 20);
     printf("answer:[%s]\r\n", ServerAnswer);
 #endif
     VirtualFree(ClientPacket, 0, MEM_RELEASE);
@@ -496,9 +505,9 @@ int SetSubclientsAlias()
 	VirtualFree(DecryptedData, 0, MEM_RELEASE);
     gUpdateKeys = 0;
 #ifdef _DEBUG
-	gotoxy(0, 25);
-	clear_screen(0, 16);
-	gotoxy(0, 16);
+	gotoxy(0, 30);
+	clear_screen(0, 20);
+	gotoxy(0, 20);
     printf("ServerAnswer: %s\r\n", (char*)DecryptedData);
 #endif
     return 0;

@@ -29,6 +29,8 @@ int SetDefaultAESVector()
     FILE* pFile = NULL;
     unsigned char * iv128Old = (unsigned char *)"1111333355557777"; // 16 byte (128 bit)
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     iv128 = (unsigned char*)VirtualAlloc(NULL, 16, MEM_COMMIT, PAGE_READWRITE);
     if (iv128 == NULL)
     {
@@ -98,6 +100,8 @@ int ServersList()
     char* Servername = NULL;
     FILE* pFile = NULL;
     char* ServernameOld = "www.ckeck.space";
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     Servername = (char*)VirtualAlloc(NULL, 256, MEM_COMMIT, PAGE_READWRITE);
     if (Servername == NULL)

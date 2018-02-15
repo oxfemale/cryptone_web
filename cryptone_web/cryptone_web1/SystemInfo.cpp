@@ -9,6 +9,8 @@ BOOL UpTime(SYSTEMTIME *pstBootTime)
 	pNtQuerySystemInformation       pfNtQuerySystemInformation = 0;
 	SYSTEM_TIME_OF_DAY_INFORMATION  SysTimeInfo;
 	FILETIME                        ftBootTime;
+    
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
 	pfNtQuerySystemInformation = (pNtQuerySystemInformation) GetProcAddress(GetModuleHandle(_T("ntdll")), "NtQuerySystemInformation");
 
@@ -41,6 +43,8 @@ unsigned char* GetSystemInfo()
 	unsigned char* SysInfoData = NULL;
 	char* ComputerName = NULL;
 	char* UserName = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
 	dwVersion = GetVersion();
 	// Get the Windows version.

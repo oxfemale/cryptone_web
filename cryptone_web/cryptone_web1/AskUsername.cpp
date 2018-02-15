@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globalvars.h"
 #include "AskUsername.h"
+#include "console.h"
 
 /*
 Function:
@@ -18,11 +19,20 @@ char* AskUserNewName()
     if (AllData == NULL) return AllData;
     memset(AllData, '-', 32);
     int iCount = 0;
-    printf("Please input Username 32 symbols max: ");
+    
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
+    gotoxy(0, 30);
+    clear_screen(0, 15);
+    gotoxy(0, 15);
+    printf("Please input Username 32 symbols max or q for exit: ");
     do
     {
         AllData[iCount] = _getch();
         printf("%c", AllData[iCount]);
+
+        if (AllData[iCount] == 'q') exit(0);
+
         if (AllData[iCount] == 3)
         {
             printf("\r\nCancel and exit.\r\n");

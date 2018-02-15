@@ -23,13 +23,16 @@ telegram: https://t.me/BelousovaAlisa
 
 int SetMenu()
 {
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     char iSelect[2] = {0};
     for (;;)
     {
-        gotoxy(200, 200);
-        clear_screen(0, 0);
+        gotoxy(2000, 2000);
+        clear_screen(0, 2);
 
-        gotoxy(0, 2);
+        gotoxy(0, 1);
+        miniLogo();
         printf("Menu for user [%s]:\r\n", gUsername);
         printf("0 - Online subclients list.\r\n");
         printf("1 - Get all subclients list.\r\n");
@@ -66,6 +69,7 @@ int SetMenu()
         if ( iSelect[0] == 3 )
         {
             printf("\r\nCancel and exit.\r\n");
+            fclose(gLogFile);
             return 0;
         }
         if (iSelect[0] == 26)
@@ -76,12 +80,14 @@ int SetMenu()
         if (iSelect[0] == 13)
         {
             printf("\r\nCancel and exit.\r\n");
+            fclose(gLogFile);
             return 0;
         }
         if (iSelect[0] == 'q')
         {
             printf("%c\r\n", iSelect[0]);
             printf("\r\nExit.\r\n");
+            fclose(gLogFile);
             return 0;
         }
 
@@ -89,6 +95,7 @@ int SetMenu()
 }
 return 0;
 }
+
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -105,9 +112,11 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	gLogFile = fopen("logfile.txt", "ab");
 	
-	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start client.", 0);
+	
     clear_screen(0,0);
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Start client.", 0);
     gotoxy(0,2);
+    LogoPrint();
 
     hModuleCRYPT = LoadLibraryA(cryptone);
     if (hModuleCRYPT == NULL)
@@ -150,8 +159,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		pasFile = fopen("pass.cfg", "rb");
 		if(pasFile == NULL)
 		{
-			strPwd = (unsigned char*)AskContainerPassword( );
-			if( strPwd == NULL ) return 0;
+			strPwd = (unsigned char*)AskContainerPassword( NULL );
+            if (strPwd == NULL)
+            {
+                fclose(gLogFile);
+                return 0;
+            }
 		}else{
 			strPwd =  (unsigned char*)VirtualAlloc( NULL, 32, MEM_COMMIT, PAGE_READWRITE );
 			if( strPwd == NULL )
@@ -159,6 +172,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				fclose(pFile);
 				fclose(pasFile);
 				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Error VirtualAlloc for password buffer.", 1);
+                fclose(gLogFile);
 				return 0;
 			}
 			memset( strPwd, '-', 32 );
@@ -166,13 +180,13 @@ int _tmain(int argc, _TCHAR* argv[])
 			fclose(pasFile);
 		}
 
-		//printf( "\r\nPassword is: \r\n%s\r\n", strPwd );
 		if( IsContainer() == 1 )
 		{
 			if( TestCfgVars( strPwd ) == 0 )
 			{
 				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Error test Container vars. Container keys is deleted, please, goto login/register again.", 1);
 				remove( "file.cfg" );
+                fclose(gLogFile);
 				return 0;
 			}
 		
@@ -180,18 +194,20 @@ int _tmain(int argc, _TCHAR* argv[])
 			{
 				remove( "file.cfg" );
 				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Not reggged user. Container keys is deleted, please, goto login/register again.", 1);
+                fclose(gLogFile);
 				return 0;
 			}else{
 				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Found reggged user.", 0);
+                
                 SetKeysMem(strPwd);
-                //printf("\r\n");
                 ClientPingServer();
-                //printf("\r\n");
+
 				HANDLE hPingThread = CreateThread(0, 0, &MainThreadPing, 0, 0, 0);
                 if (hPingThread == NULL)
                 {
                     printf("Error Start ping server.\r\n");
 					ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start thread ping server error.", 1);
+                    fclose(gLogFile);
                     return 0;
                 }
                 CloseHandle(hPingThread);
@@ -200,19 +216,19 @@ int _tmain(int argc, _TCHAR* argv[])
                 if (hPingThread == NULL)
                 {
 					ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start Client/Server Keys Exchange thread error.", 1);
+                    fclose(gLogFile);
                     return 0;
                 }
                 CloseHandle(hKeysThread);
 
-                //ClientServerKeysExchange(strPwd);
-                //SetKeysMem(strPwd);
                 SetMenu();
+                fclose(gLogFile);
 				return 1;
 			}
 		}else{
-			//remove( "file.cfg" );
 			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Container password is wrong or container file is bad.", 1);
 			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Delete file.cfg if not remebers container password.", 1);
+            fclose(gLogFile);
 			return 0;
 		}
 	}else
@@ -221,43 +237,48 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Registration error.", 1);
             remove("file.cfg");
+            fclose(gLogFile);
 			return 0;
 		}else
 		{
 			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Registration Ok, cfg file container crypted.", 0);
-            strPwd = (unsigned char*)AskContainerPassword();
-            if (strPwd == NULL) return 0;
+            strPwd = (unsigned char*)AskContainerPassword("Please, enter container password again ");
+            if (strPwd == NULL)
+            {
+                ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Container password is NULL.", 1);
+                fclose(gLogFile);
+                return 0;
+            }
             
             SetKeysMem(strPwd);
-            printf("\r\n");
             ClientPingServer();
-            printf("\r\n");
+
             HANDLE hPingThread = CreateThread(0, 0, &MainThreadPing, 0, 0, 0);
             if (hPingThread == NULL)
             {
 				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start thread ping server error.", 1);
+                fclose(gLogFile);
                 return 0;
             }
             CloseHandle(hPingThread);
 
-            //ClientServerKeysExchange(strPwd);
             HANDLE hKeysThread = CreateThread(0, 0, &MainThreadKeysExchange, strPwd, 0, 0);
             if (hPingThread == NULL)
             {
 				ConsoleOutput(__FILE__,__FUNCTION__, __LINE__, "Start Client/Server Keys Exchange thread error.", 1);
+                fclose(gLogFile);
                 return 0;
             }
             CloseHandle(hKeysThread);
 
-            //SetKeysMem(strPwd);
             SetMenu();
-
+            fclose(gLogFile);
 			return 1;
 		}
 		VirtualFree( strPwd, 0, MEM_RELEASE );
 	}
 
-
+    fclose(gLogFile);
 	return 0;
 }
 

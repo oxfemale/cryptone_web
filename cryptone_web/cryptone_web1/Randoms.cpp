@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "globalvars.h"
 #include "Randoms.h"
+#include "console.h"
 
 /*
 Function:
@@ -22,6 +23,8 @@ unsigned char* gen_random(int RandSize)
     unsigned char* Hexedstr = NULL;
     char* hexedFinal = NULL;
     if (RandSize <= 0) return NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     pbData = (BYTE*)VirtualAlloc(NULL, RandSize + 4, MEM_COMMIT, PAGE_READWRITE);
     if (pbData == NULL) return 0;

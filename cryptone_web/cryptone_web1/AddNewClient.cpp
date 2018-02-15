@@ -48,6 +48,8 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     char* unZippedChars = NULL;
     char* MasterPassword = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     AESKeyNew = gen_random(32);
     if (AESKeyNew == NULL)
     {
@@ -111,8 +113,8 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
     ServerAnswer = SendPacketData(Servername, (char*)ClientPacket);
 #ifdef _DEBUG
 	gotoxy(0, 25);
-	clear_screen(0, 16);
-	gotoxy(0, 16);
+	clear_screen(0, 20);
+	gotoxy(0, 20);
     printf("ServerAnswer:\r\n%s\r\n", ServerAnswer);
 	gotoxy(0, 14);
 #endif
@@ -167,8 +169,8 @@ int AddNewClientRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsig
         unsigned char* ServerPublicKey = AllData;
 #ifdef _DEBUG
 		gotoxy(0, 25);
-		clear_screen(0, 16);
-		gotoxy(0, 16);
+		clear_screen(0, 20);
+		gotoxy(0, 20);
         printf("Server Public key: %s\r\n", ServerPublicKey );
 		gotoxy(0, 14);
 #endif
@@ -275,6 +277,8 @@ int AddNewClientToUser(char* Servername)
     unsigned char* AESvsUSER = NULL;
     char iSelect[2] = { 0 };
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
 	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"TMP user registration.", 0);
 
     AESvsUSER = FirstHandshake(Servername, 1);
@@ -284,7 +288,7 @@ int AddNewClientToUser(char* Servername)
     }
 
     //printf("Decrypted data: %s\r\n", AESvsUSER);
-    strPwd = (unsigned char*)AskContainerPassword();
+    strPwd = (unsigned char*)AskContainerPassword(NULL);
     if (strPwd == NULL)
     {
         VirtualFree(AESvsUSER, 0, MEM_RELEASE);

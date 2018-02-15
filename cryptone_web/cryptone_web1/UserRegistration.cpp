@@ -34,6 +34,8 @@ unsigned char* RegPack1(unsigned char* VectorRandom, unsigned char* PubKeyBuffer
     int iTmpSize = 0;
     int iZiplen = 0;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     aes256_encryptC = (aes256_encryptCExp)GetProcAddress(hModuleCRYPT, "aes256_encryptC");
     if (aes256_encryptC == NULL) return 0;
     base64Encode = (base64EncodeExp)GetProcAddress(hModuleCRYPT, "base64Encode");
@@ -129,6 +131,8 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
     unsigned char *CertKeyBuffer = NULL;
     unsigned char *PackedBuffer1 = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     base64Decode = (base64DecodeExp)GetProcAddress(hModuleCRYPT, "base64Decode");
     if (base64Decode == NULL) return 0;
     private_decrypt = (private_decryptExp)GetProcAddress(hModuleCRYPT, "private_decrypt");
@@ -184,9 +188,9 @@ unsigned char* FirstHandshake(char* Servername, int iFlag)
     }
 
 #ifdef _DEBUG
-	gotoxy(0, 25);
-	clear_screen(0, 16);
-	gotoxy(0, 16);
+	gotoxy(0, 30);
+	clear_screen(0, 20);
+	gotoxy(0, 20);
 	printf("ServerRegData:\r\n%s\r\n", ServerRegData);
 	gotoxy(0, 14);
 #endif
@@ -274,6 +278,7 @@ int FirstHandshakeSaveData(unsigned char* AESvsUSER, unsigned char* strPwd, unsi
     unsigned char* AESKey = NULL;
     unsigned char* UserID = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     if (AESvsUSER == NULL) return 0;
     if (strUsername == NULL) return 0;
@@ -418,6 +423,9 @@ NULL - FAIL
 int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned char* AESVector, unsigned char*KeyPub, char* Servername, unsigned char* strPwd)
 {
     int iLen = 0, iTmp = 0, cryptedLen = 0, zippedLen = 0;
+    
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (UserID == NULL) return NULL;
     if (AESKey == NULL) return NULL;
     if (AESVector == NULL) return NULL;
@@ -502,16 +510,16 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
 
     if (ServerAnswer == NULL)
     {
-		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return NULL.", 1);
+	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server return NULL.", 1);
         VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
         return 0;
     }
 #ifdef _DEBUG
-	gotoxy(0, 25);
-	clear_screen(0, 16);
-	gotoxy(0, 16);
+	gotoxy(0, 30);
+	clear_screen(0, 20);
+	gotoxy(0, 20);
 	printf("ServerAnswer:\r\n%s\r\n", ServerAnswer);
 	gotoxy(0, 14);
 #endif
@@ -519,7 +527,7 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
     VirtualFree(ServerAnswer, 0, MEM_RELEASE);
     if (DecryptedData == NULL)
     {
-		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
+	ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"Server answer aes256_decrypt error.", 1);
         VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
         VirtualFree(AESVectorNew, 0, MEM_RELEASE);
         VirtualFree(AESKey, 0, MEM_RELEASE);
@@ -534,7 +542,7 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
         AllData = (unsigned char*)VirtualAlloc(NULL, iLen, MEM_COMMIT, PAGE_READWRITE);
         if (AllData == NULL)
         {
-			ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
+		ConsoleOutput(__FILE__,__FUNCTION__, __LINE__,"VirtualAlloc error.", 1);
             VirtualFree(DecryptedData, 0, MEM_RELEASE);
             VirtualFree(ServerContainerPassword, 0, MEM_RELEASE);
             VirtualFree(AESVectorNew, 0, MEM_RELEASE);
@@ -554,9 +562,9 @@ int FinalRegHandshake(unsigned char* UserID, unsigned char* AESKey, unsigned cha
 
         unsigned char* ServerPublicKey = AllData;
 #ifdef _DEBUG
-		gotoxy(0, 25);
-		clear_screen(0, 16);
-		gotoxy(0, 16);
+		gotoxy(0, 30);
+		clear_screen(0, 20);
+		gotoxy(0, 20);
         printf("Server Public key: %s\r\n", ServerPublicKey );
 		gotoxy(0, 14);
 #endif
@@ -663,10 +671,13 @@ int NewUserRegistration(char* Servername)
 	unsigned char* AESvsUSER = NULL;
 	char iSelect[2] = { 0 };
 
-	gotoxy(0, 25);
-	clear_screen(0, 16);
-	gotoxy(0, 16);
-	printf("Register NEW USER:\r\n");
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+	
+	ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "New user registration.", 0);
+	gotoxy(0, 30);
+	clear_screen(0, 14);
+	gotoxy(0, 14);
+	printf("New user registration.");
 
 	for (;;)
 	{
@@ -680,7 +691,10 @@ int NewUserRegistration(char* Servername)
 			if (strstr((char*)AESvsUSER, "okey")) break;
 			if (strstr((char*)AESvsUSER, "exists"))
 			{
-				printf("User already registered:\r\n\t1 - Select another NickName.\r\n\t2 - Add new SubClient for this username.\r\nselect: ");
+                gotoxy(0, 30);
+                clear_screen(0, 15);
+                gotoxy(0, 15);
+                printf("This User already registered:\r\n\t1 - Select another NickName.\r\n\t2 - Add new SubClient for this username.\r\nselect: ");
 				iSelect[0] = _getch();
 				if (iSelect[0] == '1')
 				{
@@ -707,8 +721,14 @@ int NewUserRegistration(char* Servername)
 		}
 		Sleep(100);
 	}
+
+//    gotoxy(0, 30);
+//    clear_screen(0, 14);
+    gotoxy(0, 14);
+    printf("New user registration %s.", strUsername);
+
 	//printf("Decrypted data: %s\r\n", AESvsUSER);
-	strPwd = (unsigned char*)AskContainerPassword();
+	strPwd = (unsigned char*)AskContainerPassword(NULL);
 	if (strPwd == NULL)
 	{
 		VirtualFree(strUsername, 0, MEM_RELEASE);

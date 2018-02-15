@@ -119,6 +119,7 @@ unsigned char* ReadAllContainer(unsigned char* key256)
     char* AllData = NULL;
     unsigned char *php_cipher = NULL;
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     pFile = fopen("file.cfg", "rb");
     if (pFile == NULL) return 0;
@@ -169,6 +170,9 @@ int TestCfgVars(unsigned char* key256)
     unsigned char* testKey1 = NULL;
     unsigned char* testKey2 = NULL;
     unsigned char* testKey3 = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (ReadContainer(key256, 1, &testKey1, 0) == 0)
     {
         return 0;
@@ -201,6 +205,9 @@ int 1 - OK
 int isRegUser(unsigned char* key256)
 {
     unsigned char* UsernameKey = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     if (ReadContainer(key256, 5, &UsernameKey, 0) == 0) return 0;
     VirtualFree(UsernameKey, 0, MEM_RELEASE);
 
@@ -221,6 +228,9 @@ return:
 int IsContainer()
 {
     FILE * pFile = NULL;
+    
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     pFile = fopen("file.cfg", "r");
     if (pFile != NULL)
     {
@@ -251,6 +261,8 @@ int MakeKeystoContainer(unsigned char* key256)
     int iLen = 0;
     FILE* pFile = NULL;
     char* AllData = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     //Generate RSA keys and save it to memory
     unsigned char* PrivateKeyStr = NULL;
@@ -337,11 +349,15 @@ int ReadContainer(unsigned char* key256, int iKeyType, unsigned char **KeyBuffer
     FILE* pFile = NULL;
     char* AllData = NULL;
     unsigned char *php_cipher = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     pFile = fopen("file.cfg", "rb");
     if (pFile == NULL) return 0;
     fseek(pFile, 0, SEEK_END);
     long lSize = ftell(pFile);
     fseek(pFile, 0, SEEK_SET);
+
     AllData = (char*)VirtualAlloc(NULL, lSize + 32, MEM_COMMIT, PAGE_READWRITE);
     if (AllData == NULL)
     {
@@ -405,6 +421,9 @@ unsigned char* FoundCfgVar(unsigned char* php_cipher, int decryptedLen, int iKey
     int iBegin = 0;
     int iEnd = 0;
     unsigned char *MyCfgVar = NULL;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     MyCfgVar = (unsigned char*)VirtualAlloc(NULL, decryptedLen + 32, MEM_COMMIT, PAGE_READWRITE);
     if (MyCfgVar == NULL) return 0;
 
@@ -537,6 +556,8 @@ int pos(char *s, char *c, int n)
     int i, j;		// Счетчики для циклов
     int lenC, lenS;	// Длины строк
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
                     //Находим размеры строки исходника и искомого
     for (lenC = 0; c[lenC]; lenC++);
     for (lenS = 0; s[lenS]; lenS++);
@@ -578,6 +599,8 @@ int FindStartEndString(unsigned char* php_cipher, char* cBegin1, char* cEnd1, in
 {
     int i = 0, n = 0;
     int res = 0;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     for (i = 1; n != -1; i++)
     {
@@ -636,6 +659,8 @@ unsigned char* CutOldCfgVar(unsigned char* php_cipher, char* cBegin1, char* cEnd
     unsigned char *MyCfgVar = NULL;
     int decryptedLen = strlen((char*)php_cipher);
 
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
+
     MyCfgVar = (unsigned char*)VirtualAlloc(NULL, decryptedLen + 32, MEM_COMMIT, PAGE_READWRITE);
     if (MyCfgVar == NULL) return 0;
     if (FindStartEndString(php_cipher, cBegin1, cEnd1, iBegin, iEnd, 0) == 0)
@@ -684,6 +709,8 @@ int UpdateContainer(unsigned char* key256, char* cBegin, char* cEnd, unsigned ch
     if (aes256_decryptC == NULL) return 0;
     aes256_encryptC = (aes256_encryptCExp)GetProcAddress(hModuleCRYPT, "aes256_encryptC");
     if (aes256_encryptC == NULL) return 0;
+
+    ConsoleOutput(__FILE__, __FUNCTION__, __LINE__, "Begin.", 3);
 
     unsigned char *php_cipher1 = NULL;
     int iLen = 0;
